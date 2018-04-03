@@ -1,6 +1,7 @@
 package com.zhirova.task_3.data_reading;
 
 
+import android.util.Log;
 import android.util.Xml;
 
 import com.zhirova.task_3.model.Rss;
@@ -17,10 +18,11 @@ import java.util.UUID;
 
 public class RssXmlParser {
 
+    private final String TAG = "RSS_XML_PARSER";
     private static final String ns = null;
 
 
-    public List parse(InputStream in) throws XmlPullParserException, IOException {
+    public List<Rss> parse(InputStream in) throws XmlPullParserException, IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
             parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
@@ -33,18 +35,19 @@ public class RssXmlParser {
     }
 
 
-    private List readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
-        List news = new ArrayList();
-        parser.require(XmlPullParser.START_TAG, ns, "channel");
-        while (parser.next() != XmlPullParser.END_TAG) {
+    private List<Rss> readFeed(XmlPullParser parser) throws XmlPullParserException, IOException {
+        List<Rss> news = new ArrayList<>();
+        parser.require(XmlPullParser.START_TAG, ns, "rss");
+        while (parser.next() != XmlPullParser.END_DOCUMENT) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
             String name = parser.getName();
+
             if (name.equals("item")) {
                 news.add(readItem(parser));
             } else {
-                skip(parser);
+                //skip(parser);
             }
         }
         return news;
@@ -52,6 +55,7 @@ public class RssXmlParser {
 
 
     private Rss readItem(XmlPullParser parser) throws XmlPullParserException, IOException {
+        //Log.d(TAG, "readItem");
         parser.require(XmlPullParser.START_TAG, ns, "item");
         String title = null;
         String description = null;
@@ -65,12 +69,16 @@ public class RssXmlParser {
                 title = readTitle(parser);
             } else if (name.equals("description")) {
                 description = readDescriprion(parser);
-            } else if (name.equals("media:content")) {
+            } else if (name.equals("media:content url")) {
                 image = readImage(parser);
             } else {
                 skip(parser);
             }
         }
+        Log.d(TAG, "============================================");
+        Log.d(TAG, "title = " + title);
+        Log.d(TAG, "description = " + description);
+        Log.d(TAG, "image = " + image);
         return new Rss(UUID.randomUUID().toString(), title, description, image);
     }
 
@@ -92,9 +100,9 @@ public class RssXmlParser {
 
 
     private String readImage(XmlPullParser parser) throws IOException, XmlPullParserException {
-        parser.require(XmlPullParser.START_TAG, ns, "media:content");
+        parser.require(XmlPullParser.START_TAG, ns, "media:content url");
         String image = readText(parser);
-        parser.require(XmlPullParser.END_TAG, ns, "media:content");
+        parser.require(XmlPullParser.END_TAG, ns, "media:content url");
         return image;
     }
 

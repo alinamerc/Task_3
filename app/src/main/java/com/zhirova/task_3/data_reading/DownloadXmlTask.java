@@ -40,8 +40,7 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
                 resultStream = downloadUrl(url);
                 if (resultStream != null) {
                     RssXmlParser rssXmlParser = new RssXmlParser();
-                    rssXmlParser.parse(resultStream);
-
+                    items = rssXmlParser.parse(resultStream);
                 } else {
                     throw new IOException("No response received.");
                 }
@@ -85,9 +84,6 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
             }
             stream = connection.getInputStream();
         } finally {
-            if (stream != null) {
-                stream.close();
-            }
             if (connection != null) {
                 connection.disconnect();
             }
