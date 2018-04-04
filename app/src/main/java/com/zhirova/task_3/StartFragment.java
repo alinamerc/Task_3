@@ -69,12 +69,18 @@ public class StartFragment extends Fragment {
         if (news.size() == 0) {
         } else {
             //Collections.sort(contacts, (contact1, contact2) -> contact1.getName().compareToIgnoreCase(contact2.getName()));
-            for (int i = 0; i < news.size(); i++) {
-                Log.d(TAG, "=====================================================");
-                Log.d(TAG, "TITLE = " + news.get(i).getTitle() + "\n" +
-                        "DESC = " + news.get(i).getDescription() + "\n" +
-                        "IMAGE = " + news.get(i).getImage());
-            }
+            print();
+        }
+    }
+
+
+    private void print() {
+        for (int i = 0; i < news.size(); i++) {
+            Log.d(TAG, "=====================================================");
+            Log.d(TAG, "TITLE = " + news.get(i).getTitle() + "\n" +
+                    "DESC = " + news.get(i).getDescription() + "\n" +
+                    "IMAGE = " + news.get(i).getImage() + "\n" +
+                    "DATE = " + news.get(i).getDate());
         }
     }
 

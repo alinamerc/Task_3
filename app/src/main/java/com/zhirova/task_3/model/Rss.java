@@ -1,19 +1,21 @@
 package com.zhirova.task_3.model;
 
 
+import android.util.Log;
+
+import java.util.UUID;
+
 public class Rss {
 
     private String id;
     private String title;
     private String description;
     private String image;
+    private String date;
 
 
-    public Rss(String id, String title, String description, String image) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.image = image;
+    public Rss() {
+        this.id = UUID.randomUUID().toString();
     }
 
 
@@ -54,6 +56,16 @@ public class Rss {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+
+    public String getDate() {
+        return date;
+    }
+
+
+    public void setDate(String date) {
+        this.date = date;
     }
 
 

@@ -6,8 +6,7 @@ import android.util.Log;
 
 import com.zhirova.task_3.StartFragment;
 import com.zhirova.task_3.model.Rss;
-
-import org.xmlpull.v1.XmlPullParserException;
+import com.zhirova.task_3.xml_parser.RssXmlParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,14 +38,11 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
                 URL url = new URL(urlString);
                 resultStream = downloadUrl(url);
                 if (resultStream != null) {
-                    RssXmlParser rssXmlParser = new RssXmlParser();
-                    items = rssXmlParser.parse(resultStream);
+                    items = RssXmlParser.parse(resultStream);
                 } else {
                     throw new IOException("No response received.");
                 }
             } catch(IOException e) {
-                Log.e(TAG, "ERROR", e);
-            } catch (XmlPullParserException e) {
                 Log.e(TAG, "ERROR", e);
             } finally {
                 if (resultStream != null) {
