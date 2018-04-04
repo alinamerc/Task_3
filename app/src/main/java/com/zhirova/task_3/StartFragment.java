@@ -2,7 +2,6 @@ package com.zhirova.task_3;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,17 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.zhirova.task_3.data_reading.DownloadXmlTask;
-import com.zhirova.task_3.model.Rss;
+import com.zhirova.task_3.model.Item;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class StartFragment extends Fragment {
 
     private final String TAG = "START_FRAGMENT";
     private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
-    private List<Rss> news;
+    private List<Item> news;
     private DownloadXmlTask downloadXmlTask;
 
 
@@ -63,12 +60,11 @@ public class StartFragment extends Fragment {
     }
 
 
-    public void dataBinding(List<Rss> news){
+    public void dataBinding(List<Item> news){
         this.news = news;
         downloadXmlTask = null;
         if (news.size() == 0) {
         } else {
-            //Collections.sort(contacts, (contact1, contact2) -> contact1.getName().compareToIgnoreCase(contact2.getName()));
             print();
         }
     }
@@ -80,7 +76,7 @@ public class StartFragment extends Fragment {
             Log.d(TAG, "TITLE = " + news.get(i).getTitle() + "\n" +
                     "DESC = " + news.get(i).getDescription() + "\n" +
                     "IMAGE = " + news.get(i).getImage() + "\n" +
-                    "DATE = " + news.get(i).getDate());
+                    "DATE = " + news.get(i).getDate().toString());
         }
     }
 

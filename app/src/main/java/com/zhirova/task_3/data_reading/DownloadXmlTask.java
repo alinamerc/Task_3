@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.zhirova.task_3.StartFragment;
-import com.zhirova.task_3.model.Rss;
-import com.zhirova.task_3.xml_parser.RssXmlParser;
+import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.xml_parser.ItemXmlParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +17,7 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 
-public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
+public class DownloadXmlTask extends AsyncTask<String, Void, List<Item>> {
 
     private final String TAG = "DOWNLOAD_XML_TASK";
     private final StartFragment fragment;
@@ -29,8 +29,8 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
 
 
     @Override
-    protected List<Rss> doInBackground(String... urls) {
-        List<Rss> items = new ArrayList<>();
+    protected List<Item> doInBackground(String... urls) {
+        List<Item> items = new ArrayList<>();
         if (!isCancelled() && urls != null && urls.length > 0) {
             String urlString = urls[0];
             InputStream resultStream = null;
@@ -38,7 +38,7 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
                 URL url = new URL(urlString);
                 resultStream = downloadUrl(url);
                 if (resultStream != null) {
-                    items = RssXmlParser.parse(resultStream);
+                    items = ItemXmlParser.parse(resultStream);
                 } else {
                     throw new IOException("No response received.");
                 }
@@ -59,7 +59,7 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Rss>> {
 
 
     @Override
-    protected void onPostExecute(List<Rss> result) {
+    protected void onPostExecute(List<Item> result) {
         fragment.dataBinding(result);
     }
 
