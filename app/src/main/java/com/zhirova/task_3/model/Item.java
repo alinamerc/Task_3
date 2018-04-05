@@ -7,11 +7,11 @@ import java.util.UUID;
 
 public class Item {
 
-    private final String id;
+    private String id;
     private String title;
     private String description;
     private String image;
-    private Date date;
+    private long date;
 
 
     public Item() {
@@ -21,6 +21,11 @@ public class Item {
 
     public String getId() {
         return id;
+    }
+
+
+    public void setId(String id) {
+        this.id = id;
     }
 
 
@@ -54,12 +59,12 @@ public class Item {
     }
 
 
-    public Date getDate() {
+    public long getDate() {
         return date;
     }
 
 
-    public void setDate(Date date) {
+    public void setDate(long date) {
         this.date = date;
     }
 

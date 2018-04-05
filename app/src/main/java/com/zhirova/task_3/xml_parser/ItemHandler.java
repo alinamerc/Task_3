@@ -48,7 +48,7 @@ public class ItemHandler extends DefaultHandler {
             }
             else if (localName.equalsIgnoreCase("pubDate")) {
                 try {
-                    Date date = handleDate(builder.toString());
+                    long date = handleDate(builder.toString());
                     curItem.setDate(date);
                 } catch (ParseException e) {
                     Log.e(TAG, "ERROR IN DATE-TIME PARSING!", e);
@@ -91,18 +91,19 @@ public class ItemHandler extends DefaultHandler {
         String newDesc1 = desc.replace("<div>", "");
         String newDesc2 = newDesc1.replace("</div>", "");
         String newDesc3 = newDesc2.replace("<br />", "");
-        String newDesc4 = newDesc3.replace("&nbsp;", "");
+        String newDesc4 = newDesc3.replace("&nbsp;", " ");
         return newDesc4;
     }
 
 
-    private Date handleDate(String dateString) throws ParseException {
+    private long handleDate(String dateString) throws ParseException {
         //2018-04-04T08:18:54+00:00
         // DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
         //Wed, 04 Apr 2018 12:08:21 +0000
         DateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
         Date date = format.parse(dateString);
-        return date;
+        long millisecondsCount = date.getTime();
+        return millisecondsCount;
     }
 
 

@@ -76,7 +76,7 @@ public class StartFragment extends Fragment {
             Log.d(TAG, "TITLE = " + news.get(i).getTitle() + "\n" +
                     "DESC = " + news.get(i).getDescription() + "\n" +
                     "IMAGE = " + news.get(i).getImage() + "\n" +
-                    "DATE = " + news.get(i).getDate().toString());
+                    "DATE = " + news.get(i).getDate());
         }
     }
 
