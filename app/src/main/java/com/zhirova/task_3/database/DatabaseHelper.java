@@ -19,13 +19,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        ItemContract.createTable(db);
+        DatabaseApi.createTable(db);
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        ItemContract.onUpgrade(db);
+        DatabaseApi.onUpgrade(db);
     }
 
 

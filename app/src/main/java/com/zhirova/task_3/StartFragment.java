@@ -8,17 +8,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zhirova.task_3.data_reading.DownloadXmlTask;
 import com.zhirova.task_3.model.Item;
 
 import java.util.List;
+
 
 public class StartFragment extends Fragment {
 
     private final String TAG = "START_FRAGMENT";
     private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
+
     private List<Item> news;
-    private DownloadXmlTask downloadXmlTask;
+
+
+//    SQLiteDatabase database = new DatabaseHelper(fragment.getContext()).getWritableDatabase();
+////        ItemsTable.addItem("2", "Адриано", "Адриано: Идеальным завершением сезона было бы завоевание двух трофеев",
+////                "head_0.jpg", 1234234, database);
+//        return ItemsTable.getAllItems(database);
 
 
     @Override
@@ -30,47 +36,16 @@ public class StartFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (news == null){
-            loadPage();
-        }
     }
 
 
     @Override
     public void onPause() {
         super.onPause();
-        if (downloadXmlTask != null){
-            downloadXmlTask.cancel(true);
-            downloadXmlTask = null;
-        }
     }
 
 
-    public void loadPage() {
-//        if((sPref.equals(ANY)) && (wifiConnected || mobileConnected)) {
-//            new DownloadXmlTask().execute(URL);
-//        }
-//        else if ((sPref.equals(WIFI)) && (wifiConnected)) {
-//            new DownloadXmlTask().execute(URL);
-//        } else {
-//            // show error
-//        }
-        downloadXmlTask = new DownloadXmlTask(this);
-        downloadXmlTask.execute(URL);
-    }
-
-
-    public void dataBinding(List<Item> news){
-        this.news = news;
-        downloadXmlTask = null;
-        if (news.size() == 0) {
-        } else {
-            print();
-        }
-    }
-
-
-    private void print() {
+    private void print(List<Item> news) {
         for (int i = 0; i < news.size(); i++) {
             Log.d(TAG, "=====================================================");
             Log.d(TAG, "TITLE = " + news.get(i).getTitle() + "\n" +

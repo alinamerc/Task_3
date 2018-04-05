@@ -1,10 +1,8 @@
-package com.zhirova.task_3.data_reading;
+package com.zhirova.task_3.network;
 
 
-import android.os.AsyncTask;
 import android.util.Log;
 
-import com.zhirova.task_3.StartFragment;
 import com.zhirova.task_3.model.Item;
 import com.zhirova.task_3.xml_parser.ItemXmlParser;
 
@@ -17,22 +15,14 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 
-public class DownloadXmlTask extends AsyncTask<String, Void, List<Item>> {
+public class RemoteApi {
 
-    private final String TAG = "DOWNLOAD_XML_TASK";
-    private final StartFragment fragment;
-
-
-    public DownloadXmlTask(StartFragment fragment) {
-        this.fragment = fragment;
-    }
+    private final String TAG = "REMOTE_API";
 
 
-    @Override
-    protected List<Item> doInBackground(String... urls) {
+    public List<Item> loadNews(String urlString) {
         List<Item> items = new ArrayList<>();
-        if (!isCancelled() && urls != null && urls.length > 0) {
-            String urlString = urls[0];
+        if (urlString != null) {
             InputStream resultStream = null;
             try {
                 URL url = new URL(urlString);
@@ -42,14 +32,14 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Item>> {
                 } else {
                     throw new IOException("No response received.");
                 }
-            } catch(IOException e) {
-                Log.e(TAG, "ERROR", e);
+            } catch (IOException e) {
+                Log.e(TAG, "MALFORMED URL ERROR", e);
             } finally {
                 if (resultStream != null) {
                     try {
                         resultStream.close();
                     } catch (IOException e) {
-                        Log.e(TAG, "ERROR", e);
+                        Log.e(TAG, "INPUT STREAM CLOSING ERROR", e);
                     }
                 }
             }
@@ -58,9 +48,16 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Item>> {
     }
 
 
-    @Override
-    protected void onPostExecute(List<Item> result) {
-        fragment.dataBinding(result);
+    private boolean isConnectionPossible() {
+//        if((sPref.equals(ANY)) && (wifiConnected || mobileConnected)) {
+//            new DownloadXmlTask().execute(URL);
+//        }
+//        else if ((sPref.equals(WIFI)) && (wifiConnected)) {
+//            new DownloadXmlTask().execute(URL);
+//        } else {
+//            // show error
+//        }
+        return true;
     }
 
 
@@ -89,13 +86,3 @@ public class DownloadXmlTask extends AsyncTask<String, Void, List<Item>> {
 
 
 }
-
-
-
-
-
-
-
-
-
-
