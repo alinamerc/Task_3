@@ -28,8 +28,7 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
     @Nullable
     @Override
     public List<Item> loadInBackground() {
-        Log.d(TAG, "loadInBackground_____FromNetworkLoader");
-
+        Log.d(TAG, "loadInBackground_________FromNetworkLoader");
         List<Item> news = RemoteApi.loadNews(url);
         return news;
     }

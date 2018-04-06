@@ -51,8 +51,8 @@ public class DatabaseApi {
 
     public static List<Item> getAllItems(SQLiteDatabase database) {
         Cursor cursor = database.query(ItemContract.ItemEntry.TABLE_NAME, ItemContract.ItemEntry.itemAllColumns,
-                null,null, null, null, null);
-                //" ORDER BY " + ItemContract.ItemEntry.COLUMN_DATE + "DESC");
+                null,null, null, null,
+                ItemContract.ItemEntry.COLUMN_DATE + " DESC");
         return getResultFromCursor(cursor);
     }
 
@@ -60,7 +60,7 @@ public class DatabaseApi {
     private static List<Item> getResultFromCursor(Cursor cursor) {
         List<Item> result = new ArrayList<>();
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor != null) {
             int idIndex = cursor.getColumnIndex(ItemContract.ItemEntry.COLUMN_ID);
             int titleIndex = cursor.getColumnIndex(ItemContract.ItemEntry.COLUMN_TITLE);
             int descIndex = cursor.getColumnIndex(ItemContract.ItemEntry.COLUMN_DESC);

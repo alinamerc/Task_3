@@ -3,4 +3,18 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="backColorDefault">#fae9db</color>
+    <color name="backColorPressed">#fd8878</color>
+
+    <color name="textColorDefault">#fa100000</color>
+    <color name="textColorPressed">#ffffff</color>
+
+    <color name="globalBack">#f7c3bc</color>
+
+    <color name="progressBar">#ee3346</color>
+
+    <color name="circleGreen">#0ea358</color>
+
+
 </resources>

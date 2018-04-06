@@ -7,45 +7,70 @@ import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zhirova.task_3.adapter.ItemsAdapter;
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
 import com.zhirova.task_3.loaders.FromDatabaseLoader;
 import com.zhirova.task_3.loaders.FromNetworkLoader;
 import com.zhirova.task_3.model.Item;
-import com.zhirova.task_3.network.RemoteApi;
 
 import java.util.List;
 
 
-public class StartFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Item>> {
+public class StartFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Item>>,
+        ItemsAdapter.ClickListener {
 
     private final String TAG = "START_FRAGMENT";
+    private final String SAVE_FLAG = "CHECK_ON_FIRST_LOADING";
     private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
 
     private final int LOADER_FROM_DATABASE_ID = 1;
     private final int LOADER_FROM_NETWORK_ID = 2;
 
     private Loader<List<Item>> readingLoader;
-    private boolean isFirstLoadingFromDatabase = true;
+    private boolean isFirstLoadingFromDatabase;
+
+    private ItemsAdapter adapter;
+    private RecyclerView recyclerView;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
+        if (savedInstanceState == null) {
+            isFirstLoadingFromDatabase = true;
+        } else {
+            isFirstLoadingFromDatabase = savedInstanceState.getBoolean(SAVE_FLAG);
+        }
         return inflater.inflate(R.layout.fragment_start, container, false);
+    }
+
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        initUI();
+        initAdapter();
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        //readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
-        Log.d(TAG, "onResume");
+        readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
+    }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(SAVE_FLAG, isFirstLoadingFromDatabase);
     }
 
 
@@ -70,11 +95,11 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
                 isFirstLoadingFromDatabase = false;
                 readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
             } else {
-                print(data);
+                adapter.setData(data);
             }
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
-            updateDatabase(data);
+            updateTable(data);
             readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
             readingLoader.forceLoad();
         }
@@ -86,7 +111,21 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    private void updateDatabase(List<Item> news) {
+    private void initUI() {
+        recyclerView = getActivity().findViewById(R.id.recycler_view_items);
+    }
+
+
+    private void initAdapter() {
+        adapter = new ItemsAdapter(getContext());
+        adapter.setClickListener(this);
+        recyclerView.setAdapter(adapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+    }
+
+
+    private void updateTable(List<Item> news) {
         SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
         DatabaseApi.deleteAllItems(database);
         for (Item curItem:news) {
@@ -105,6 +144,12 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
                     "IMAGE = " + news.get(i).getImage() + "\n" +
                     "DATE = " + news.get(i).getDate());
         }
+    }
+
+
+    @Override
+    public void onClick(Item item) {
+
     }
 
 

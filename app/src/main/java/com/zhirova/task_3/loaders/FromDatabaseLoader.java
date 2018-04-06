@@ -30,8 +30,7 @@ public class FromDatabaseLoader extends AsyncTaskLoader<List<Item>> {
     @Nullable
     @Override
     public List<Item> loadInBackground() {
-        Log.d(TAG, "loadInBackground_____FromDatabaseLoader");
-
+        Log.d(TAG, "loadInBackground_________FromDatabaseLoader");
         SQLiteDatabase database = new DatabaseHelper(context).getWritableDatabase();
         List<Item> news = DatabaseApi.getAllItems(database);
         database.close();
