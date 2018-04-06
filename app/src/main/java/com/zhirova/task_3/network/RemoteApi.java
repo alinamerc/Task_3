@@ -17,10 +17,10 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class RemoteApi {
 
-    private final String TAG = "REMOTE_API";
+    private final static String TAG = "REMOTE_API";
 
 
-    public List<Item> loadNews(String urlString) {
+    public static List<Item> loadNews(String urlString) {
         List<Item> items = new ArrayList<>();
         if (urlString != null) {
             InputStream resultStream = null;
@@ -61,7 +61,7 @@ public class RemoteApi {
     }
 
 
-    private InputStream downloadUrl(URL url) throws IOException {
+    private static InputStream downloadUrl(URL url) throws IOException {
         InputStream stream = null;
         HttpsURLConnection connection = null;
         try {
