@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#b53f86</color>
+    <color name="colorPrimaryDark">#9f3073</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="backColorDefault">#fae9db</color>
-    <color name="backColorPressed">#fd8878</color>
+    <color name="backColorDefault">#ead3d1</color>
+    <color name="backColorPressed">#955863</color>
 
     <color name="textColorDefault">#fa100000</color>
-    <color name="textColorPressed">#ffffff</color>
+    <color name="textColorPressed">#ebdfe1</color>
 
-    <color name="globalBack">#f7c3bc</color>
+    <color name="globalBack">#c78fa0</color>
 
     <color name="progressBar">#ee3346</color>
-
-    <color name="circleGreen">#0ea358</color>
-
 
 </resources>

@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +37,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private final int LOADER_FROM_NETWORK_ID = 2;
 
     private Loader<List<Item>> readingLoader;
+    private SQLiteDatabase database;
     private boolean isFirstLoadingFromDatabase;
 
     private ItemsAdapter adapter;
@@ -56,7 +59,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initUI();
-        initAdapter();
+        initData();
     }
 
 
@@ -116,17 +119,19 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    private void initAdapter() {
+    private void initData() {
         adapter = new ItemsAdapter(getContext());
         adapter.setClickListener(this);
+
         recyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
+
+        database = new DatabaseHelper(getContext()).getWritableDatabase();
     }
 
 
     private void updateTable(List<Item> news) {
-        SQLiteDatabase database = new DatabaseHelper(getContext()).getWritableDatabase();
         DatabaseApi.deleteAllItems(database);
         for (Item curItem:news) {
             DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),
@@ -149,7 +154,13 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onClick(Item item) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        DetailFragment curFragment = DetailFragment.create(item.getId());
 
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, curFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 
 

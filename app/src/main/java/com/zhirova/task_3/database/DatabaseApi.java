@@ -57,6 +57,16 @@ public class DatabaseApi {
     }
 
 
+    public static Item getSelectedItem(SQLiteDatabase database, String id) {
+        String selection = ItemContract.ItemEntry.COLUMN_ID + " = ?";
+        String[] selectionArgs = {id};
+        Cursor cursor = database.query(ItemContract.ItemEntry.TABLE_NAME, ItemContract.ItemEntry.itemAllColumns,
+                selection, selectionArgs, null, null, null);
+        List<Item> items = getResultFromCursor(cursor);
+        return items.get(0);
+    }
+
+
     private static List<Item> getResultFromCursor(Cursor cursor) {
         List<Item> result = new ArrayList<>();
 
