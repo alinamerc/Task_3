@@ -1,5 +1,6 @@
 package com.zhirova.task_3;
 
+import android.arch.lifecycle.Lifecycle;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -51,6 +52,15 @@ public class DetailFragment extends Fragment {
     }
 
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (getActivity().getLifecycle().getCurrentState() == Lifecycle.State.DESTROYED) {
+            database.close();
+        }
+    }
+
+
     private void initUI() {
         detailImage = getActivity().findViewById(R.id.detail_image_view);
         titleText = getActivity().findViewById(R.id.detail_title_text_view);
@@ -63,7 +73,7 @@ public class DetailFragment extends Fragment {
         String curItemId = bundle.getString(BUNDLE_KEY);
         database = new DatabaseHelper(getContext()).getWritableDatabase();
         curItem = DatabaseApi.getSelectedItem(database, curItemId);
-        database.close();
+        //database.close();
 
         Picasso.get().load(curItem.getImage()).into(detailImage);
         titleText.setText(curItem.getTitle());

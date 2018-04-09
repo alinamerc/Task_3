@@ -1,5 +1,7 @@
 package com.zhirova.task_3;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +46,11 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private RecyclerView recyclerView;
 
 
+    public void setFirstLoadingFromDatabase(boolean isFirstLoadingFromDatabase) {
+        this.isFirstLoadingFromDatabase = isFirstLoadingFromDatabase;
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (savedInstanceState == null) {
@@ -77,6 +84,15 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (getActivity().getLifecycle().getCurrentState() == Lifecycle.State.DESTROYED) {
+            database.close();
+        }
+    }
+
+
     @NonNull
     @Override
     public Loader<List<Item>> onCreateLoader(int id, @Nullable Bundle args) {
@@ -94,11 +110,10 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(@NonNull Loader<List<Item>> loader, List<Item> data) {
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
+            adapter.setData(data);
             if (isFirstLoadingFromDatabase) {
                 isFirstLoadingFromDatabase = false;
                 readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
-            } else {
-                adapter.setData(data);
             }
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
@@ -137,7 +152,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),
                     curItem.getImage(), (int) curItem.getDate(), database);
         }
-        database.close();
+        //database.close();
     }
 
 

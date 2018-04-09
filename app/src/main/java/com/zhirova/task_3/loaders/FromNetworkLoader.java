@@ -11,6 +11,7 @@ import com.zhirova.task_3.model.Item;
 import com.zhirova.task_3.network.RemoteApi;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
@@ -28,6 +29,11 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
     @Nullable
     @Override
     public List<Item> loadInBackground() {
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            Log.e(TAG, "ERROR", e);
+        }
         Log.d(TAG, "loadInBackground_________FromNetworkLoader");
         List<Item> news = RemoteApi.loadNews(url);
         return news;
