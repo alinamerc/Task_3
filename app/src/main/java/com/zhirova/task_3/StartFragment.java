@@ -2,7 +2,9 @@ package com.zhirova.task_3;
 
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,25 +13,31 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.zhirova.task_3.adapter.ItemsAdapter;
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
+import com.zhirova.task_3.database.ItemContract;
+import com.zhirova.task_3.diff_util.ItemDiffUtilCallback;
 import com.zhirova.task_3.loaders.FromDatabaseLoader;
 import com.zhirova.task_3.loaders.FromNetworkLoader;
 import com.zhirova.task_3.model.Item;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class StartFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Item>>,
-        ItemsAdapter.ClickListener {
+        ItemsAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private final String TAG = "START_FRAGMENT";
     private final String SAVE_FLAG = "CHECK_ON_FIRST_LOADING";
@@ -40,15 +48,13 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private Loader<List<Item>> readingLoader;
     private SQLiteDatabase database;
+    SharedPreferences preferences;
+    private List<Item> oldNews = null;
     private boolean isFirstLoadingFromDatabase;
 
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
-
-
-    public void setFirstLoadingFromDatabase(boolean isFirstLoadingFromDatabase) {
-        this.isFirstLoadingFromDatabase = isFirstLoadingFromDatabase;
-    }
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     @Override
@@ -110,7 +116,12 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(@NonNull Loader<List<Item>> loader, List<Item> data) {
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
-            adapter.setData(data);
+            if (oldNews == null) {
+                oldNews = data;
+            }
+            updateRecycleView(data);
+            oldNews = data;
+
             if (isFirstLoadingFromDatabase) {
                 isFirstLoadingFromDatabase = false;
                 readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
@@ -129,8 +140,33 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
+    @Override
+    public void onClick(Item item) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        DetailFragment curFragment = DetailFragment.create(item.getId());
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, curFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+
+    @Override
+    public void onRefresh() {
+        swipeRefreshLayout.setRefreshing(true);
+        swipeRefreshLayout.postDelayed(() -> {
+            swipeRefreshLayout.setRefreshing(false);
+            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
+            readingLoader.forceLoad();
+        }, 2000);
+    }
+
+
     private void initUI() {
         recyclerView = getActivity().findViewById(R.id.recycler_view_items);
+        swipeRefreshLayout = getActivity().findViewById(R.id.refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
 
@@ -156,6 +192,17 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
+    private void updateRecycleView(List<Item> actualNews) {
+        List<Item> oldList = new ArrayList<>(oldNews);
+        List<Item> newList = new ArrayList<>(actualNews);
+
+        ItemDiffUtilCallback itemDiffUtilCallback = new ItemDiffUtilCallback(oldList, newList);
+        DiffUtil.DiffResult itemDiffResult = DiffUtil.calculateDiff(itemDiffUtilCallback, true);
+        adapter.setData(actualNews);
+        itemDiffResult.dispatchUpdatesTo(adapter);
+    }
+
+
     private void print(List<Item> news) {
         for (int i = 0; i < news.size(); i++) {
             Log.d(TAG, "==========================================");
@@ -164,18 +211,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
                     "IMAGE = " + news.get(i).getImage() + "\n" +
                     "DATE = " + news.get(i).getDate());
         }
-    }
-
-
-    @Override
-    public void onClick(Item item) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        DetailFragment curFragment = DetailFragment.create(item.getId());
-
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.container, curFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
 
