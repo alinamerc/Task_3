@@ -1,12 +1,14 @@
 package com.zhirova.task_3;
 
 import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.preference.PreferenceManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
@@ -14,6 +16,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,12 +25,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.zhirova.task_3.adapter.ItemsAdapter;
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
-import com.zhirova.task_3.database.ItemContract;
 import com.zhirova.task_3.diff_util.ItemDiffUtilCallback;
 import com.zhirova.task_3.loaders.FromDatabaseLoader;
 import com.zhirova.task_3.loaders.FromNetworkLoader;
@@ -54,7 +58,10 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
+    private ProgressBar progressBar;
+    private TextView infoText;
     private SwipeRefreshLayout swipeRefreshLayout;
+
 
 
     @Override
@@ -116,21 +123,39 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(@NonNull Loader<List<Item>> loader, List<Item> data) {
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
-            if (oldNews == null) {
+            Log.d(TAG, "LOADER_FROM_DATABASE_ID");
+            if (data.size() > 0) {
+                if (oldNews == null) {
+                    oldNews = data;
+                }
+                updateRecycleView(data);
                 oldNews = data;
+                progressBar.setVisibility(View.INVISIBLE);
+                infoText.setVisibility(View.INVISIBLE);
             }
-            updateRecycleView(data);
-            oldNews = data;
-
+            else {
+                progressBar.setVisibility(View.VISIBLE);
+                infoText.setVisibility(View.VISIBLE);
+            }
             if (isFirstLoadingFromDatabase) {
                 isFirstLoadingFromDatabase = false;
                 readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
             }
+            else {
+                progressBar.setVisibility(View.INVISIBLE);
+                infoText.setVisibility(View.INVISIBLE);
+            }
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
-            updateTable(data);
-            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
-            readingLoader.forceLoad();
+            Log.d(TAG, "LOADER_FROM_NETWORK_ID");
+            if (isOnline()) {
+                handleNetworkData(data);
+                readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
+                readingLoader.forceLoad();
+            } else {
+                Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet), Snackbar.LENGTH_LONG);
+                snackbar.show();
+            }
         }
     }
 
@@ -155,16 +180,20 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
+        swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
         swipeRefreshLayout.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
+            isFirstLoadingFromDatabase = false;
             readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
             readingLoader.forceLoad();
-        }, 2000);
+        }, 3000);
     }
 
 
     private void initUI() {
         recyclerView = getActivity().findViewById(R.id.recycler_view_items);
+        progressBar = getActivity().findViewById(R.id.progress_bar);
+        infoText = getActivity().findViewById(R.id.info_text_view);
         swipeRefreshLayout = getActivity().findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
     }
@@ -179,6 +208,24 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         recyclerView.setLayoutManager(layoutManager);
 
         database = new DatabaseHelper(getContext()).getWritableDatabase();
+    }
+
+
+    private boolean isOnline() {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
+
+
+    private void handleNetworkData(List<Item> data) {
+        ActionBar toolbar = ((AppCompatActivity)getContext()).getSupportActionBar();
+        if (toolbar != null) {
+            toolbar.setTitle(data.get(0).getTitle());
+        }
+        data.remove(0);
+        updateTable(data);
     }
 
 

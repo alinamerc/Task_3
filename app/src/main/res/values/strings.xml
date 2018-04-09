@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Task_3</string>
+    <string name="app_name"></string>
+    <string name="no_news">There is no news!</string>
+    <string name="no_internet">There is no connection!</string>
 </resources>

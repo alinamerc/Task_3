@@ -12,6 +12,10 @@
 
     <color name="globalBack">#c78fa0</color>
 
-    <color name="progressBar">#ee3346</color>
+    <color name="refresh1">#27bc79</color>
+    <color name="refresh2">#5833ee</color>
+    <color name="refresh3">#fab39d</color>
+
+
 
 </resources>

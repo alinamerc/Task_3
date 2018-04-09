@@ -1,6 +1,7 @@
 package com.zhirova.task_3.network;
 
 
+
 import android.util.Log;
 
 import com.zhirova.task_3.model.Item;
@@ -45,19 +46,6 @@ public class RemoteApi {
             }
         }
         return items;
-    }
-
-
-    private boolean isConnectionPossible() {
-//        if((sPref.equals(ANY)) && (wifiConnected || mobileConnected)) {
-//            new DownloadXmlTask().execute(URL);
-//        }
-//        else if ((sPref.equals(WIFI)) && (wifiConnected)) {
-//            new DownloadXmlTask().execute(URL);
-//        } else {
-//            // show error
-//        }
-        return true;
     }
 
 

@@ -51,9 +51,10 @@ public class DatabaseApi {
 
     public static List<Item> getAllItems(SQLiteDatabase database) {
         Cursor cursor = database.query(ItemContract.ItemEntry.TABLE_NAME, ItemContract.ItemEntry.itemAllColumns,
-                null,null, null, null,
+                null, null, null, null,
                 ItemContract.ItemEntry.COLUMN_DATE + " DESC");
         return getResultFromCursor(cursor);
+
     }
 
 

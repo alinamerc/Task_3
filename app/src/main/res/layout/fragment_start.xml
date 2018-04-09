@@ -31,6 +31,7 @@
                 android:visibility="invisible"
                 android:indeterminate="true"
                 android:indeterminateTintMode="src_atop"
+                android:indeterminateTint="@color/refresh2"
                 android:scaleX="2"
                 android:scaleY="2">
             </ProgressBar>
@@ -42,7 +43,8 @@
                 android:layout_gravity="center"
                 android:visibility="invisible"
                 android:textAlignment="center"
-                android:textSize="30dp"/>
+                android:text="@string/no_news"
+                android:textSize="26dp"/>
 
         </FrameLayout>
 
