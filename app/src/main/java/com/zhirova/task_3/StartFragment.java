@@ -1,8 +1,6 @@
 package com.zhirova.task_3;
 
-import android.arch.lifecycle.Lifecycle;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -52,7 +50,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private Loader<List<Item>> readingLoader;
     private SQLiteDatabase database;
-    SharedPreferences preferences;
+    //private SharedPreferences preferences;
     private List<Item> oldNews = null;
     private boolean isFirstLoadingFromDatabase;
 
@@ -61,7 +59,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private ProgressBar progressBar;
     private TextView infoText;
     private SwipeRefreshLayout swipeRefreshLayout;
-
 
 
     @Override
@@ -86,7 +83,11 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onResume() {
         super.onResume();
-        readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
+
+        //if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState() == Lifecycle.State.STARTED) {
+            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID,
+                    null, this);
+        //}
     }
 
 
@@ -94,15 +95,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean(SAVE_FLAG, isFirstLoadingFromDatabase);
-    }
-
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (getActivity().getLifecycle().getCurrentState() == Lifecycle.State.DESTROYED) {
-            database.close();
-        }
     }
 
 
@@ -235,7 +227,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),
                     curItem.getImage(), (int) curItem.getDate(), database);
         }
-        //database.close();
     }
 
 

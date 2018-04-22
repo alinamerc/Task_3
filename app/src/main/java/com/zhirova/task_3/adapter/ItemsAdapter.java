@@ -32,7 +32,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
         if (items != null){
             this.items.addAll(items);
         }
-        notifyDataSetChanged();
+        //notifyDataSetChanged();
     }
 
 
