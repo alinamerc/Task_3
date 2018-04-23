@@ -44,7 +44,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         ItemsAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private final String TAG = "START_FRAGMENT";
-    private final String SAVE_FLAG = "CHECK_ON_FIRST_LOADING";
     private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
 
     private final int LOADER_FROM_DATABASE_ID = 1;
@@ -52,7 +51,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     private Loader<List<Item>> readingLoader;
     private List<Item> oldNews = null;
-    private boolean isFirstLoadingFromDatabase;
 
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
@@ -63,11 +61,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            isFirstLoadingFromDatabase = true;
-        } else {
-            isFirstLoadingFromDatabase = savedInstanceState.getBoolean(SAVE_FLAG);
-        }
         return inflater.inflate(R.layout.fragment_start, container, false);
     }
 
@@ -76,25 +69,17 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initUI();
-        initData();
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-
-        //if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState() == Lifecycle.State.STARTED) {
+        if (ItemApplication.isNeedUpdate) {
+            initData();
             readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID,
                     null, this);
-        //}
-    }
-
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(SAVE_FLAG, isFirstLoadingFromDatabase);
+        }
     }
 
 
@@ -116,26 +101,27 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
             Log.d(TAG, "LOADER_FROM_DATABASE_ID");
+            progressBar.setVisibility(View.INVISIBLE);
+            infoText.setVisibility(View.INVISIBLE);
+
             if (data.size() > 0) {
                 if (oldNews == null) {
                     oldNews = data;
                 }
                 updateRecycleView(data);
                 oldNews = data;
-                progressBar.setVisibility(View.INVISIBLE);
-                infoText.setVisibility(View.INVISIBLE);
             }
-            else {
-                progressBar.setVisibility(View.VISIBLE);
-                infoText.setVisibility(View.VISIBLE);
-            }
-            if (isFirstLoadingFromDatabase) {
-                isFirstLoadingFromDatabase = false;
+
+            if (ItemApplication.isNeedUpdate) {
+                ItemApplication.isNeedUpdate = false;
                 readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
-            }
-            else {
-                progressBar.setVisibility(View.INVISIBLE);
-                infoText.setVisibility(View.INVISIBLE);
+                if (data.size() == 0) {
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+            } else {
+                if (data.size() == 0) {
+                    infoText.setVisibility(View.VISIBLE);
+                }
             }
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
@@ -175,7 +161,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
         swipeRefreshLayout.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
-            isFirstLoadingFromDatabase = false;
             readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
             readingLoader.forceLoad();
         }, 3000);
@@ -192,6 +177,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void initData() {
+        Log.d(TAG, "initData");
         adapter = new ItemsAdapter(getContext());
         adapter.setClickListener(this);
 

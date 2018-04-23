@@ -25,6 +25,11 @@ public class LocalApi {
     }
 
 
+    public Item getSelectedNews(String id) {
+        return DatabaseApi.getSelectedItem(database, id);
+    }
+
+
     public List<Item> getNews() {
         List<Item> news = DatabaseApi.getAllItems(database);
         return news;

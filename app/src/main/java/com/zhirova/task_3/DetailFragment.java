@@ -14,26 +14,22 @@ import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.zhirova.task_3.application.ItemApplication;
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
 import com.zhirova.task_3.model.Item;
 
 public class DetailFragment extends Fragment {
 
-    private static final String BUNDLE_KEY = "ITEM_ID";
-    private SQLiteDatabase database;
-    private Item curItem;
-
+    private String itemId;
     private ImageView detailImage;
     private TextView titleText;
     private TextView descText;
 
 
-    public static DetailFragment create(String id){
-        Bundle bundle = new Bundle();
-        bundle.putString(BUNDLE_KEY, id);
+    public static DetailFragment create(String itemId){
         DetailFragment detailFragment = new DetailFragment();
-        detailFragment.setArguments(bundle);
+        detailFragment.itemId = itemId;
         return detailFragment;
     }
 
@@ -60,11 +56,7 @@ public class DetailFragment extends Fragment {
 
 
     private void initData() {
-        Bundle bundle = getArguments();
-        String curItemId = bundle.getString(BUNDLE_KEY);
-        database = new DatabaseHelper(getContext()).getWritableDatabase();
-        curItem = DatabaseApi.getSelectedItem(database, curItemId);
-
+        Item curItem = ItemApplication.localApi.getSelectedNews(itemId);
         Picasso.get().load(curItem.getImage()).into(detailImage);
         titleText.setText(curItem.getTitle());
         descText.setText(curItem.getDescription());
