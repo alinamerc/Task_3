@@ -27,6 +27,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.zhirova.task_3.adapter.ItemsAdapter;
+import com.zhirova.task_3.application.ItemApplication;
+import com.zhirova.task_3.data_repository.RemoteApi;
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
 import com.zhirova.task_3.diff_util.ItemDiffUtilCallback;
@@ -49,8 +51,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private final int LOADER_FROM_NETWORK_ID = 2;
 
     private Loader<List<Item>> readingLoader;
-    private SQLiteDatabase database;
-    //private SharedPreferences preferences;
     private List<Item> oldNews = null;
     private boolean isFirstLoadingFromDatabase;
 
@@ -140,8 +140,8 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
             Log.d(TAG, "LOADER_FROM_NETWORK_ID");
-            if (isOnline()) {
-                handleNetworkData(data);
+            if (RemoteApi.isOnline(getContext())) {
+                ItemApplication.localApi.updateNews(data);
                 readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
                 readingLoader.forceLoad();
             } else {
@@ -198,35 +198,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         recyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-
-        database = new DatabaseHelper(getContext()).getWritableDatabase();
-    }
-
-
-    private boolean isOnline() {
-        ConnectivityManager connectivityManager =
-                (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
-    }
-
-
-    private void handleNetworkData(List<Item> data) {
-        ActionBar toolbar = ((AppCompatActivity)getContext()).getSupportActionBar();
-        if (toolbar != null) {
-            toolbar.setTitle(data.get(0).getTitle());
-        }
-        data.remove(0);
-        updateTable(data);
-    }
-
-
-    private void updateTable(List<Item> news) {
-        DatabaseApi.deleteAllItems(database);
-        for (Item curItem:news) {
-            DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),
-                    curItem.getImage(), (int) curItem.getDate(), database);
-        }
     }
 
 

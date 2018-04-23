@@ -8,7 +8,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.zhirova.task_3.model.Item;
-import com.zhirova.task_3.network.RemoteApi;
+import com.zhirova.task_3.data_repository.RemoteApi;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

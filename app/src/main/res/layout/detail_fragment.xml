@@ -38,7 +38,7 @@
                 android:layout_marginTop="80dp"
                 android:layout_centerHorizontal="true"
                 android:layout_below="@+id/detail_title_text_view"
-                android:background="@android:drawable/ic_dialog_alert"
+                android:background="@drawable/ic_waiting"
                 android:scaleX="2"
                 android:scaleY="2"/>
 

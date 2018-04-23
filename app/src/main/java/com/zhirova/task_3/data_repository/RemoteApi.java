@@ -1,7 +1,10 @@
-package com.zhirova.task_3.network;
+package com.zhirova.task_3.data_repository;
 
 
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.zhirova.task_3.model.Item;
@@ -19,6 +22,14 @@ import javax.net.ssl.HttpsURLConnection;
 public class RemoteApi {
 
     private final static String TAG = "REMOTE_API";
+
+
+    public static boolean isOnline(Context context) {
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+    }
 
 
     public static List<Item> loadNews(String urlString) {

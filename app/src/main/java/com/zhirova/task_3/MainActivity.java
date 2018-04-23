@@ -1,14 +1,12 @@
 package com.zhirova.task_3;
 
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-
-// https://devcolibri.com/android-fragment-%D1%87%D1%82%D0%BE-%D1%8D%D1%82%D0%BE/
-// https://metanit.com/java/android/8.2.php
-// https://metanit.com/java/android/8.5.php
+import com.zhirova.task_3.model.Item;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -21,7 +19,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         fragmentManager = getSupportFragmentManager();
 
         if (savedInstanceState == null) {

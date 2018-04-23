@@ -21,7 +21,6 @@ public class ItemHandler extends DefaultHandler {
     private ArrayList<Item> news;
     private Item curItem;
     private StringBuilder builder;
-    private boolean isFirstTitle;
 
 
     public ArrayList<Item> getNews() {
@@ -60,13 +59,6 @@ public class ItemHandler extends DefaultHandler {
             }
             builder.setLength(0);
         }
-        else if (isFirstTitle && localName.equalsIgnoreCase("title")) {
-            isFirstTitle = false;
-            Item specialItem = new Item();
-            specialItem.setTitle(builder.toString());
-            news.add(specialItem);
-            builder.setLength(0);
-        }
     }
 
 
@@ -75,7 +67,6 @@ public class ItemHandler extends DefaultHandler {
         super.startDocument();
         news = new ArrayList<>();
         builder = new StringBuilder();
-        isFirstTitle = true;
     }
 
 
