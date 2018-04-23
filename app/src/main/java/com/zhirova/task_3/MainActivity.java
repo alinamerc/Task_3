@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
             StartFragment curFragment = new StartFragment();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container, curFragment);
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }
     }

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.zhirova.task_3.application.ItemApplication;
 import com.zhirova.task_3.model.Item;
 import com.zhirova.task_3.data_repository.RemoteApi;
 
@@ -36,6 +37,7 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
         }
         Log.d(TAG, "loadInBackground_________FromNetworkLoader");
         List<Item> news = RemoteApi.loadNews(url);
+        ItemApplication.localApi.updateNews(news);
         return news;
     }
 

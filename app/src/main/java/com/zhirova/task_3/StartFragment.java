@@ -101,8 +101,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
             Log.d(TAG, "LOADER_FROM_DATABASE_ID");
-            progressBar.setVisibility(View.INVISIBLE);
-            infoText.setVisibility(View.INVISIBLE);
 
             if (data.size() > 0) {
                 if (oldNews == null) {
@@ -126,10 +124,11 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
             Log.d(TAG, "LOADER_FROM_NETWORK_ID");
+            progressBar.setVisibility(View.INVISIBLE);
+            infoText.setVisibility(View.INVISIBLE);
+
             if (RemoteApi.isOnline(getContext())) {
-                ItemApplication.localApi.updateNews(data);
-                readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID, null, this);
-                readingLoader.forceLoad();
+                updateRecycleView(data);
             } else {
                 Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet), Snackbar.LENGTH_LONG);
                 snackbar.show();
@@ -149,7 +148,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         DetailFragment curFragment = DetailFragment.create(item.getId());
 
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.container, curFragment);
+        fragmentTransaction.add(R.id.container, curFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -163,7 +162,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             swipeRefreshLayout.setRefreshing(false);
             readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
             readingLoader.forceLoad();
-        }, 3000);
+        }, 1000);
     }
 
 
@@ -188,6 +187,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void updateRecycleView(List<Item> actualNews) {
+        Log.i("KLS", "updateRecycleView");
         List<Item> oldList = new ArrayList<>(oldNews);
         List<Item> newList = new ArrayList<>(actualNews);
 
@@ -201,8 +201,8 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private void print(List<Item> news) {
         for (int i = 0; i < news.size(); i++) {
             Log.d(TAG, "==========================================");
-            Log.d(TAG, "TITLE = " + news.get(i).getTitle() + "\n" +
-                    "DESC = " + news.get(i).getDescription() + "\n" +
+            Log.d(TAG, "ID = " + news.get(i).getId() + "\n" +
+                    "TITLE = " + news.get(i).getTitle() + "\n" +
                     "IMAGE = " + news.get(i).getImage() + "\n" +
                     "DATE = " + news.get(i).getDate());
         }

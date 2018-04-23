@@ -39,7 +39,10 @@ public class ItemHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String name) throws SAXException {
         super.endElement(uri, localName, name);
         if (curItem != null){
-            if (localName.equalsIgnoreCase("title")) {
+            if (localName.equalsIgnoreCase("guid")) {
+                curItem.setId(builder.toString());
+            }
+            else if (localName.equalsIgnoreCase("title")) {
                 curItem.setTitle(builder.toString());
             }
             else if (localName.equalsIgnoreCase("description")) {

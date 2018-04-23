@@ -3,6 +3,7 @@ package com.zhirova.task_3.data_repository;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
@@ -31,12 +32,14 @@ public class LocalApi {
 
 
     public List<Item> getNews() {
+        Log.d("KLS", "getNews");
         List<Item> news = DatabaseApi.getAllItems(database);
         return news;
     }
 
 
     public void updateNews(List<Item> news) {
+        Log.d("KLS", "updateNews");
         DatabaseApi.deleteAllItems(database);
         for (Item curItem:news) {
             DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),

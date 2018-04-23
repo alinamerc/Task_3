@@ -33,6 +33,7 @@ public class RemoteApi {
 
 
     public static List<Item> loadNews(String urlString) {
+        Log.d("KLS", "loadNews");
         List<Item> items = new ArrayList<>();
         if (urlString != null) {
             InputStream resultStream = null;

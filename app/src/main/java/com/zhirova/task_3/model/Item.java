@@ -14,11 +14,6 @@ public class Item {
     private long date;
 
 
-    public Item() {
-        this.id = UUID.randomUUID().toString();
-    }
-
-
     public String getId() {
         return id;
     }
