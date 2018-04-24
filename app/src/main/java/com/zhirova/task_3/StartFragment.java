@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -50,7 +52,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private final int LOADER_FROM_NETWORK_ID = 2;
 
     private Loader<List<Item>> readingLoader;
-    private List<Item> oldNews = null;
+    private List<Item> oldNews = new ArrayList<>();
 
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
@@ -75,7 +77,9 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onResume() {
         super.onResume();
+
         if (ItemApplication.isNeedUpdate) {
+            ItemApplication.isNeedUpdate = false;
             initData();
             readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID,
                     null, this);
@@ -100,35 +104,27 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(@NonNull Loader<List<Item>> loader, List<Item> data) {
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
-            Log.d(TAG, "LOADER_FROM_DATABASE_ID");
-
             if (data.size() > 0) {
-                if (oldNews == null) {
-                    oldNews = data;
-                }
                 updateRecycleView(data);
-                oldNews = data;
-            }
-
-            if (ItemApplication.isNeedUpdate) {
-                ItemApplication.isNeedUpdate = false;
-                readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
-                if (data.size() == 0) {
-                    progressBar.setVisibility(View.VISIBLE);
-                }
+                oldNews = new ArrayList<>(data);
             } else {
-                if (data.size() == 0) {
-                    infoText.setVisibility(View.VISIBLE);
-                }
+                progressBar.setVisibility(View.VISIBLE);
             }
+            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
-            Log.d(TAG, "LOADER_FROM_NETWORK_ID");
             progressBar.setVisibility(View.INVISIBLE);
             infoText.setVisibility(View.INVISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
 
             if (RemoteApi.isOnline(getContext())) {
-                updateRecycleView(data);
+                if (data.size() > 0) {
+                    updateRecycleView(data);
+                    oldNews = new ArrayList<>(data);
+                } else {
+                    infoText.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
             } else {
                 Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet), Snackbar.LENGTH_LONG);
                 snackbar.show();
@@ -144,13 +140,15 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onClick(Item item) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        DetailFragment curFragment = DetailFragment.create(item.getId());
+        if (RemoteApi.isOnline(getContext())) {
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            DetailFragment curFragment = DetailFragment.create(item.getId());
 
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.container, curFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.container, curFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        }
     }
 
 
@@ -160,7 +158,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
         swipeRefreshLayout.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
-            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
+            readingLoader = getActivity().getSupportLoaderManager().restartLoader(LOADER_FROM_NETWORK_ID,null, this);
             readingLoader.forceLoad();
         }, 1000);
     }
@@ -176,7 +174,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void initData() {
-        Log.d(TAG, "initData");
         adapter = new ItemsAdapter(getContext());
         adapter.setClickListener(this);
 
@@ -195,6 +192,11 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         DiffUtil.DiffResult itemDiffResult = DiffUtil.calculateDiff(itemDiffUtilCallback, true);
         adapter.setData(actualNews);
         itemDiffResult.dispatchUpdatesTo(adapter);
+
+        Handler scrollHandler = new Handler(Looper.getMainLooper());
+        scrollHandler.postDelayed(() -> {
+            recyclerView.smoothScrollToPosition(0);
+        }, 200);
     }
 
 

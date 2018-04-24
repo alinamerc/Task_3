@@ -11,6 +11,7 @@ import com.zhirova.task_3.application.ItemApplication;
 import com.zhirova.task_3.model.Item;
 import com.zhirova.task_3.data_repository.RemoteApi;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -18,11 +19,13 @@ import java.util.concurrent.TimeUnit;
 public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
 
     private final String TAG = "START_FRAGMENT";
+    private Context context;
     private String url;
 
 
     public FromNetworkLoader(@NonNull Context context, String url) {
         super(context);
+        this.context = context;
         this.url = url;
     }
 
@@ -31,13 +34,15 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
     @Override
     public List<Item> loadInBackground() {
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             Log.e(TAG, "ERROR", e);
         }
-        Log.d(TAG, "loadInBackground_________FromNetworkLoader");
-        List<Item> news = RemoteApi.loadNews(url);
-        ItemApplication.localApi.updateNews(news);
+        List<Item> news = new ArrayList<>();
+        if (RemoteApi.isOnline(context)) {
+            news = RemoteApi.loadNews(url);
+            ItemApplication.localApi.updateNews(news);
+        }
         return news;
     }
 

@@ -28,7 +28,6 @@ public class FromDatabaseLoader extends AsyncTaskLoader<List<Item>> {
     @Nullable
     @Override
     public List<Item> loadInBackground() {
-        Log.d(TAG, "loadInBackground_________FromDatabaseLoader");
         return ItemApplication.localApi.getNews();
     }
 
