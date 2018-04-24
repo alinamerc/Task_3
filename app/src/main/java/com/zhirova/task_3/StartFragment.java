@@ -1,9 +1,5 @@
 package com.zhirova.task_3;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -16,8 +12,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,8 +25,6 @@ import android.widget.TextView;
 import com.zhirova.task_3.adapter.ItemsAdapter;
 import com.zhirova.task_3.application.ItemApplication;
 import com.zhirova.task_3.data_repository.RemoteApi;
-import com.zhirova.task_3.database.DatabaseApi;
-import com.zhirova.task_3.database.DatabaseHelper;
 import com.zhirova.task_3.diff_util.ItemDiffUtilCallback;
 import com.zhirova.task_3.loaders.FromDatabaseLoader;
 import com.zhirova.task_3.loaders.FromNetworkLoader;
@@ -46,6 +38,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         ItemsAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private final String TAG = "START_FRAGMENT";
+    private final String BUNDLE_SELECTED = "SELECTED_ITEM";
     private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
 
     private final int LOADER_FROM_DATABASE_ID = 1;
@@ -60,6 +53,9 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private TextView infoText;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private boolean isDualPane = false;
+    private String selectedItemId = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -70,7 +66,18 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null) {
+            selectedItemId = savedInstanceState.getString(BUNDLE_SELECTED);
+        }
         initUI();
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(BUNDLE_SELECTED, selectedItemId);
     }
 
 
@@ -139,20 +146,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     @Override
-    public void onClick(Item item) {
-        if (RemoteApi.isOnline(getContext())) {
-            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-            DetailFragment curFragment = DetailFragment.create(item.getId());
-
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.container, curFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
-        }
-    }
-
-
-    @Override
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
@@ -161,6 +154,23 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             readingLoader = getActivity().getSupportLoaderManager().restartLoader(LOADER_FROM_NETWORK_ID,null, this);
             readingLoader.forceLoad();
         }, 1000);
+    }
+
+
+    @Override
+    public void onClick(Item item) {
+        if (RemoteApi.isOnline(getContext())) {
+//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//            DetailFragment curFragment = DetailFragment.create(item.getId());
+//
+//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.add(R.id.container, curFragment);
+//            fragmentTransaction.addToBackStack(null);
+//            fragmentTransaction.commit();
+
+            selectedItemId = item.getId();
+            showDetails();
+        }
     }
 
 
@@ -197,6 +207,37 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         scrollHandler.postDelayed(() -> {
             recyclerView.smoothScrollToPosition(0);
         }, 200);
+
+        View detailsFrame = getActivity().findViewById(R.id.details);
+        isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+        if (isDualPane) {
+            showDetails();
+        }
+    }
+
+
+    private void showDetails() {
+        if (selectedItemId != null) {
+            if (isDualPane) {
+                DetailFragment details = (DetailFragment) getFragmentManager().findFragmentById(R.id.details);
+
+                if (details == null || !details.getShownId().equals(selectedItemId)) {
+                    details = DetailFragment.create(selectedItemId);
+                    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+                    fragmentTransaction.replace(R.id.details, details);
+                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                    fragmentTransaction.commit();
+                }
+            } else {
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                DetailFragment curFragment = DetailFragment.create(selectedItemId);
+
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(R.id.start, curFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        }
     }
 
 

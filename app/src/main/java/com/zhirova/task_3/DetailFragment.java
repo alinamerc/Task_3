@@ -21,15 +21,17 @@ import com.zhirova.task_3.model.Item;
 
 public class DetailFragment extends Fragment {
 
-    private String itemId;
+    private static final String BUNDLE_ID = "ITEM_ID";
     private ImageView detailImage;
     private TextView titleText;
     private TextView descText;
 
 
-    public static DetailFragment create(String itemId){
+    public static DetailFragment create(String id){
+        Bundle bundle = new Bundle();
+        bundle.putString(BUNDLE_ID, id);
         DetailFragment detailFragment = new DetailFragment();
-        detailFragment.itemId = itemId;
+        detailFragment.setArguments(bundle);
         return detailFragment;
     }
 
@@ -56,10 +58,20 @@ public class DetailFragment extends Fragment {
 
 
     private void initData() {
-        Item curItem = ItemApplication.localApi.getSelectedNews(itemId);
+        Bundle bundle = getArguments();
+        String curItemId = bundle.getString(BUNDLE_ID);
+        Item curItem = ItemApplication.localApi.getSelectedNews(curItemId);
+
         Picasso.get().load(curItem.getImage()).into(detailImage);
         titleText.setText(curItem.getTitle());
         descText.setText(curItem.getDescription());
+    }
+
+
+    public String getShownId() {
+        Bundle bundle = getArguments();
+        String curItemId = bundle.getString(BUNDLE_ID);
+        return curItemId;
     }
 
 

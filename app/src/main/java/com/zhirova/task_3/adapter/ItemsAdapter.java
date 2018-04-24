@@ -27,6 +27,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     }
 
 
+    public Item getItemByPos(int pos){
+        return items.get(pos);
+    }
+
+
     public void setData(List<Item> items){
         this.items.clear();
         if (items != null){
@@ -60,6 +65,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
         Item curItem = items.get(position);
         holder.itemView.setTag(curItem);
         holder.itemTitle.setText(curItem.getTitle());
+
     }
 
 
