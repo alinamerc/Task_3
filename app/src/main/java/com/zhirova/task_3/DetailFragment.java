@@ -45,15 +45,15 @@ public class DetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initUI();
+        initUI(view);
         initData();
     }
 
 
-    private void initUI() {
-        detailImage = getActivity().findViewById(R.id.detail_image_view);
-        titleText = getActivity().findViewById(R.id.detail_title_text_view);
-        descText = getActivity().findViewById(R.id.detail_desc_text_view);
+    private void initUI(View root) {
+        detailImage = root.findViewById(R.id.detail_image_view);
+        titleText = root.findViewById(R.id.detail_title_text_view);
+        descText = root.findViewById(R.id.detail_desc_text_view);
     }
 
 

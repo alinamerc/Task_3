@@ -3,9 +3,11 @@ package com.zhirova.task_3.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.zhirova.task_3.R;
@@ -20,15 +22,12 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     private final LayoutInflater inflater;
     private List<Item> items = new ArrayList<>();
     private ClickListener clickListener;
+    private ItemsViewHolder oldHolder = null;
+    private String selectId = null;
 
 
     public ItemsAdapter (Context context) {
         this.inflater = LayoutInflater.from(context);
-    }
-
-
-    public Item getItemByPos(int pos){
-        return items.get(pos);
     }
 
 
@@ -52,8 +51,15 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
         ItemsViewHolder holder = new ItemsViewHolder(view);
 
         holder.itemView.setOnClickListener(v -> {
-            if (clickListener != null){
-                clickListener.onClick((Item)v.getTag());
+            if (clickListener != null) {
+                if (oldHolder != null) {
+                    oldHolder.itemElement.setBackgroundResource(R.color.backColorDefault);
+                }
+                String itemId = (String)v.getTag();
+                clickListener.onClick(itemId);
+                holder.itemElement.setBackgroundResource(R.color.backColorPressed);
+                oldHolder = holder;
+                selectId = itemId;
             }
         });
         return holder;
@@ -63,9 +69,14 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     @Override
     public void onBindViewHolder(ItemsViewHolder holder, int position) {
         Item curItem = items.get(position);
-        holder.itemView.setTag(curItem);
+        holder.itemView.setTag(curItem.getId());
         holder.itemTitle.setText(curItem.getTitle());
 
+        if (curItem.getId().equals(selectId)) {
+            holder.itemElement.setBackgroundResource(R.color.backColorPressed);
+        } else {
+            holder.itemElement.setBackgroundResource(R.color.backColorDefault);
+        }
     }
 
 
@@ -76,17 +87,19 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
 
 
     static class ItemsViewHolder extends RecyclerView.ViewHolder {
-        private TextView itemTitle;
+        TextView itemTitle;
+        FrameLayout itemElement;
 
         ItemsViewHolder(View view){
             super(view);
             itemTitle = view.findViewById(R.id.item_list_text_view);
+            itemElement = view.findViewById(R.id.category_item);
         }
     }
 
 
     public interface ClickListener{
-        void onClick(Item item);
+        void onClick(String itemId);
     }
 
 

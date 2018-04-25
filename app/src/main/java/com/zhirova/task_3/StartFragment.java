@@ -58,6 +58,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private ProgressBar progressBar;
     private TextView infoText;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private View detailsFrame;
 
 
     @Override
@@ -72,7 +73,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         if (savedInstanceState != null) {
             selectedItemId = savedInstanceState.getString(BUNDLE_SELECTED);
         }
-        initUI();
+        initUI(view);
         initData();
         fragmentManager = getActivity().getSupportFragmentManager();
         loaderManager = getActivity().getSupportLoaderManager();
@@ -167,7 +168,10 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     @Override
-    public void onClick(Item item) {
+    public void onClick(String itemId) {
+
+        Log.d("ALBOM", "onClick");
+
         if (RemoteApi.isOnline(getContext())) {
 //            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 //            DetailFragment curFragment = DetailFragment.create(item.getId());
@@ -177,17 +181,36 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 //            fragmentTransaction.addToBackStack(null);
 //            fragmentTransaction.commit();
 
-            selectedItemId = item.getId();
-            showDetails();
+            selectedItemId = itemId;
+
+            Log.d("ALBOM", "isDualPane = " + isDualPane);
+            Log.d("ALBOM", "selectedItemId = " + selectedItemId);
+
+            if (isDualPane) {
+                DetailFragment details = (DetailFragment) fragmentManager.findFragmentById(R.id.details);
+                if (details == null || !details.getShownId().equals(itemId)) {
+                    details = DetailFragment.create(itemId);
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.details, details);
+                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                    fragmentTransaction.commit();
+                }
+            } else {
+                DetailFragment curFragment = DetailFragment.create(itemId);
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.add(R.id.start, curFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
         }
     }
 
 
-    private void initUI() {
-        recyclerView = getActivity().findViewById(R.id.recycler_view_items);
-        progressBar = getActivity().findViewById(R.id.progress_bar);
-        infoText = getActivity().findViewById(R.id.info_text_view);
-        swipeRefreshLayout = getActivity().findViewById(R.id.refresh);
+    private void initUI(View root) {
+        recyclerView = root.findViewById(R.id.recycler_view_items);
+        progressBar = root.findViewById(R.id.progress_bar);
+        infoText = root.findViewById(R.id.info_text_view);
+        swipeRefreshLayout = root.findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
     }
 
@@ -217,37 +240,15 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             recyclerView.smoothScrollToPosition(0);
         }, 200);
 
-        View detailsFrame = getActivity().findViewById(R.id.details);
+        detailsFrame = getActivity().findViewById(R.id.details);
         isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
-        selectedItemId = actualNews.get(0).getId();
 
-        if (isDualPane) {
-            showDetails();
+        if (selectedItemId == null && !ItemApplication.isNeedUpdate) {
+            selectedItemId = actualNews.get(0).getId();
         }
-    }
-
-
-    private void showDetails() {
-        Log.d("ALBOM", "showDetails");
-        Log.d("ALBOM", "selectedItemId = " + selectedItemId);
-        Log.d("ALBOM", "isDualPane = " + isDualPane);
 
         if (isDualPane) {
-            DetailFragment details = (DetailFragment) fragmentManager.findFragmentById(R.id.details);
-            if (details == null || !details.getShownId().equals(selectedItemId)) {
-                details = DetailFragment.create(selectedItemId);
-
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.details, details);
-                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                fragmentTransaction.commit();
-            }
-        } else {
-            DetailFragment curFragment = DetailFragment.create(selectedItemId);
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.start, curFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            onClick(selectedItemId);
         }
     }
 
