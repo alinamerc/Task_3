@@ -47,14 +47,17 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private Loader<List<Item>> readingLoader;
     private List<Item> oldNews = new ArrayList<>();
 
+    private FragmentManager fragmentManager;
+    private LoaderManager loaderManager;
+
+    private boolean isDualPane = false;
+    private String selectedItemId = null;
+
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView infoText;
     private SwipeRefreshLayout swipeRefreshLayout;
-
-    private boolean isDualPane = false;
-    private String selectedItemId = null;
 
 
     @Override
@@ -66,11 +69,13 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         if (savedInstanceState != null) {
             selectedItemId = savedInstanceState.getString(BUNDLE_SELECTED);
         }
         initUI();
+        initData();
+        fragmentManager = getActivity().getSupportFragmentManager();
+        loaderManager = getActivity().getSupportLoaderManager();
     }
 
 
@@ -84,13 +89,8 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onResume() {
         super.onResume();
-
-        if (ItemApplication.isNeedUpdate) {
-            ItemApplication.isNeedUpdate = false;
-            initData();
-            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_DATABASE_ID,
-                    null, this);
-        }
+        loaderManager.destroyLoader(LOADER_FROM_DATABASE_ID);
+        readingLoader = loaderManager.initLoader(LOADER_FROM_DATABASE_ID,null, this);
     }
 
 
@@ -109,31 +109,40 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<Item>> loader, List<Item> data) {
+        progressBar.setVisibility(View.INVISIBLE);
+        infoText.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.VISIBLE);
+
+        if (data.size() > 0) {
+            updateRecycleView(data);
+            oldNews = new ArrayList<>(data);
+        }
+
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
-            if (data.size() > 0) {
-                updateRecycleView(data);
-                oldNews = new ArrayList<>(data);
-            } else {
-                progressBar.setVisibility(View.VISIBLE);
+            if (ItemApplication.isNeedUpdate) {
+                ItemApplication.isNeedUpdate = false;
+                readingLoader = loaderManager.initLoader(LOADER_FROM_NETWORK_ID,null, this);
+                if (data.size() == 0) {
+                    progressBar.setVisibility(View.VISIBLE);
+                }
             }
-            readingLoader = getActivity().getSupportLoaderManager().initLoader(LOADER_FROM_NETWORK_ID, null, this);
+            else {
+                if (data.size() == 0) {
+                    infoText.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.INVISIBLE);
+                }
+            }
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
-            progressBar.setVisibility(View.INVISIBLE);
-            infoText.setVisibility(View.INVISIBLE);
-            recyclerView.setVisibility(View.VISIBLE);
-
             if (RemoteApi.isOnline(getContext())) {
-                if (data.size() > 0) {
-                    updateRecycleView(data);
-                    oldNews = new ArrayList<>(data);
-                } else {
+                if (data.size() == 0) {
                     infoText.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.INVISIBLE);
                 }
             } else {
-                Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet), Snackbar.LENGTH_LONG);
+                Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet),
+                        Snackbar.LENGTH_LONG);
                 snackbar.show();
             }
         }
@@ -151,7 +160,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
         swipeRefreshLayout.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
-            readingLoader = getActivity().getSupportLoaderManager().restartLoader(LOADER_FROM_NETWORK_ID,null, this);
+            readingLoader = loaderManager.restartLoader(LOADER_FROM_NETWORK_ID,null, this);
             readingLoader.forceLoad();
         }, 1000);
     }
@@ -210,6 +219,8 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
         View detailsFrame = getActivity().findViewById(R.id.details);
         isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+        selectedItemId = actualNews.get(0).getId();
+
         if (isDualPane) {
             showDetails();
         }
@@ -217,26 +228,26 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void showDetails() {
-        if (selectedItemId != null) {
-            if (isDualPane) {
-                DetailFragment details = (DetailFragment) getFragmentManager().findFragmentById(R.id.details);
+        Log.d("ALBOM", "showDetails");
+        Log.d("ALBOM", "selectedItemId = " + selectedItemId);
+        Log.d("ALBOM", "isDualPane = " + isDualPane);
 
-                if (details == null || !details.getShownId().equals(selectedItemId)) {
-                    details = DetailFragment.create(selectedItemId);
-                    FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                    fragmentTransaction.replace(R.id.details, details);
-                    fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                    fragmentTransaction.commit();
-                }
-            } else {
-                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                DetailFragment curFragment = DetailFragment.create(selectedItemId);
+        if (isDualPane) {
+            DetailFragment details = (DetailFragment) fragmentManager.findFragmentById(R.id.details);
+            if (details == null || !details.getShownId().equals(selectedItemId)) {
+                details = DetailFragment.create(selectedItemId);
 
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.add(R.id.start, curFragment);
-                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.replace(R.id.details, details);
+                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                 fragmentTransaction.commit();
             }
+        } else {
+            DetailFragment curFragment = DetailFragment.create(selectedItemId);
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.start, curFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         }
     }
 
