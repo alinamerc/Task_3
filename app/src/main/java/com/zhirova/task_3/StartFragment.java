@@ -51,14 +51,13 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private LoaderManager loaderManager;
 
     private boolean isDualPane = false;
-    private String selectedItemId = null;
+    public static String selectedItemId = null;
 
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private TextView infoText;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private View detailsFrame;
 
 
     @Override
@@ -169,9 +168,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onClick(String itemId) {
-
         Log.d("ALBOM", "onClick");
-
         if (RemoteApi.isOnline(getContext())) {
 //            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
 //            DetailFragment curFragment = DetailFragment.create(item.getId());
@@ -183,8 +180,13 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
             selectedItemId = itemId;
 
-            Log.d("ALBOM", "isDualPane = " + isDualPane);
-            Log.d("ALBOM", "selectedItemId = " + selectedItemId);
+            int selectedPosition = adapter.positionById(selectedItemId);
+            if (selectedPosition > 0) {
+                Handler scrollHandler = new Handler(Looper.getMainLooper());
+                scrollHandler.postDelayed(() -> {
+                    recyclerView.smoothScrollToPosition(selectedPosition);
+                }, 200);
+            }
 
             if (isDualPane) {
                 DetailFragment details = (DetailFragment) fragmentManager.findFragmentById(R.id.details);
@@ -216,7 +218,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void initData() {
-        adapter = new ItemsAdapter(getContext());
+        adapter = new ItemsAdapter(getContext(), selectedItemId);
         adapter.setClickListener(this);
 
         recyclerView.setAdapter(adapter);
@@ -240,7 +242,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             recyclerView.smoothScrollToPosition(0);
         }, 200);
 
-        detailsFrame = getActivity().findViewById(R.id.details);
+        View detailsFrame = getActivity().findViewById(R.id.details);
         isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
 
         if (selectedItemId == null && !ItemApplication.isNeedUpdate) {

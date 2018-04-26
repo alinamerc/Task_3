@@ -4,8 +4,10 @@ import android.arch.lifecycle.Lifecycle;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ public class DetailFragment extends Fragment {
     private ImageView detailImage;
     private TextView titleText;
     private TextView descText;
+    private boolean isDualPane = false;
 
 
     public static DetailFragment create(String id){
@@ -45,6 +48,19 @@ public class DetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        View detailsFrame = getActivity().findViewById(R.id.details);
+        isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
+        Log.d("DETAIL", "isDualPane = " + isDualPane);
+
+//        if (isDualPane) {
+//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+//            StartFragment start = (StartFragment) fragmentManager.findFragmentById(R.id.start);
+//            Bundle bundle = getArguments();
+//            String curItemId = bundle.getString(BUNDLE_ID);
+//            start.onClick(curItemId);
+//        }
+
         initUI(view);
         initData();
     }

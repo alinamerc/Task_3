@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.zhirova.task_3.R;
+import com.zhirova.task_3.StartFragment;
 import com.zhirova.task_3.model.Item;
 
 import java.util.ArrayList;
@@ -26,8 +27,9 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     private String selectId = null;
 
 
-    public ItemsAdapter (Context context) {
+    public ItemsAdapter (Context context, String selectId) {
         this.inflater = LayoutInflater.from(context);
+        this.selectId = selectId;
     }
 
 
@@ -45,6 +47,16 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     }
 
 
+    public int positionById(String id){
+        for(int i = 0; i < items.size(); i++){
+            if (items.get(i).getId().equals(id)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+
     @Override
     public ItemsViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = inflater.inflate(R.layout.news_list_item, parent, false);
@@ -55,6 +67,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
                 if (oldHolder != null) {
                     oldHolder.itemElement.setBackgroundResource(R.color.backColorDefault);
                 }
+
                 String itemId = (String)v.getTag();
                 clickListener.onClick(itemId);
                 holder.itemElement.setBackgroundResource(R.color.backColorPressed);
@@ -86,7 +99,12 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     }
 
 
-    static class ItemsViewHolder extends RecyclerView.ViewHolder {
+    public void clearHolder(ItemsViewHolder holder) {
+        holder.itemElement.setBackgroundResource(R.color.backColorDefault);
+    }
+
+
+    public static class ItemsViewHolder extends RecyclerView.ViewHolder {
         TextView itemTitle;
         FrameLayout itemElement;
 
