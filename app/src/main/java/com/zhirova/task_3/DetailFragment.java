@@ -48,19 +48,6 @@ public class DetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        View detailsFrame = getActivity().findViewById(R.id.details);
-        isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
-        Log.d("DETAIL", "isDualPane = " + isDualPane);
-
-//        if (isDualPane) {
-//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//            StartFragment start = (StartFragment) fragmentManager.findFragmentById(R.id.start);
-//            Bundle bundle = getArguments();
-//            String curItemId = bundle.getString(BUNDLE_ID);
-//            start.onClick(curItemId);
-//        }
-
         initUI(view);
         initData();
     }
@@ -88,6 +75,14 @@ public class DetailFragment extends Fragment {
         Bundle bundle = getArguments();
         String curItemId = bundle.getString(BUNDLE_ID);
         return curItemId;
+    }
+
+
+    public void update(String curItemId) {
+        Bundle bundle = new Bundle();
+        bundle.putString(BUNDLE_ID, curItemId);
+        setArguments(bundle);
+        initData();
     }
 
 

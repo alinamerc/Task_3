@@ -23,7 +23,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     private final LayoutInflater inflater;
     private List<Item> items = new ArrayList<>();
     private ClickListener clickListener;
-    private ItemsViewHolder oldHolder = null;
     private String selectId = null;
 
 
@@ -47,6 +46,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     }
 
 
+    public void setSelectId(String selectId) {
+        this.selectId = selectId;
+    }
+
+
     public int positionById(String id){
         for(int i = 0; i < items.size(); i++){
             if (items.get(i).getId().equals(id)) {
@@ -64,15 +68,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
 
         holder.itemView.setOnClickListener(v -> {
             if (clickListener != null) {
-                if (oldHolder != null) {
-                    oldHolder.itemElement.setBackgroundResource(R.color.backColorDefault);
-                }
-
                 String itemId = (String)v.getTag();
                 clickListener.onClick(itemId);
                 holder.itemElement.setBackgroundResource(R.color.backColorPressed);
-                oldHolder = holder;
                 selectId = itemId;
+                notifyDataSetChanged();
             }
         });
         return holder;
@@ -96,11 +96,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     @Override
     public int getItemCount() {
         return items.size();
-    }
-
-
-    public void clearHolder(ItemsViewHolder holder) {
-        holder.itemElement.setBackgroundResource(R.color.backColorDefault);
     }
 
 

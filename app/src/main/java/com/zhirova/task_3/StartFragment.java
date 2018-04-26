@@ -168,18 +168,8 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onClick(String itemId) {
-        Log.d("ALBOM", "onClick");
         if (RemoteApi.isOnline(getContext())) {
-//            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-//            DetailFragment curFragment = DetailFragment.create(item.getId());
-//
-//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//            fragmentTransaction.add(R.id.container, curFragment);
-//            fragmentTransaction.addToBackStack(null);
-//            fragmentTransaction.commit();
-
             selectedItemId = itemId;
-
             int selectedPosition = adapter.positionById(selectedItemId);
             if (selectedPosition > 0) {
                 Handler scrollHandler = new Handler(Looper.getMainLooper());
@@ -190,17 +180,20 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
             if (isDualPane) {
                 DetailFragment details = (DetailFragment) fragmentManager.findFragmentById(R.id.details);
-                if (details == null || !details.getShownId().equals(itemId)) {
+                if (details == null) {
                     details = DetailFragment.create(itemId);
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.details, details);
                     fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
                     fragmentTransaction.commit();
                 }
+                else if (!details.getShownId().equals(itemId)){
+                    details.update(itemId);
+                }
             } else {
                 DetailFragment curFragment = DetailFragment.create(itemId);
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.add(R.id.start, curFragment);
+                fragmentTransaction.add(R.id.container, curFragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
@@ -244,13 +237,12 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
         View detailsFrame = getActivity().findViewById(R.id.details);
         isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
-
-        if (selectedItemId == null && !ItemApplication.isNeedUpdate) {
+        if (selectedItemId == null && ItemApplication.isNeedUpdate) {
             selectedItemId = actualNews.get(0).getId();
         }
-
         if (isDualPane) {
             onClick(selectedItemId);
+            adapter.setSelectId(selectedItemId);
         }
     }
 
