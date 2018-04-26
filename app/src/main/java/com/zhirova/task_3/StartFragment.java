@@ -73,7 +73,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             selectedItemId = savedInstanceState.getString(BUNDLE_SELECTED);
         }
         initUI(view);
-        initData();
         fragmentManager = getActivity().getSupportFragmentManager();
         loaderManager = getActivity().getSupportLoaderManager();
     }
@@ -168,6 +167,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onClick(String itemId) {
+        Log.d("KLS", "_______________onClick");
         if (RemoteApi.isOnline(getContext())) {
             selectedItemId = itemId;
             int selectedPosition = adapter.positionById(selectedItemId);
@@ -221,12 +221,13 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void updateRecycleView(List<Item> actualNews) {
-        Log.i("KLS", "updateRecycleView");
+        Log.d("KLS", "updateRecycleView");
         List<Item> oldList = new ArrayList<>(oldNews);
         List<Item> newList = new ArrayList<>(actualNews);
 
         ItemDiffUtilCallback itemDiffUtilCallback = new ItemDiffUtilCallback(oldList, newList);
         DiffUtil.DiffResult itemDiffResult = DiffUtil.calculateDiff(itemDiffUtilCallback, true);
+        initData();
         adapter.setData(actualNews);
         itemDiffResult.dispatchUpdatesTo(adapter);
 
@@ -237,12 +238,15 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
         View detailsFrame = getActivity().findViewById(R.id.details);
         isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
-        if (selectedItemId == null && ItemApplication.isNeedUpdate) {
+        if (selectedItemId == null) {
             selectedItemId = actualNews.get(0).getId();
         }
         if (isDualPane) {
             onClick(selectedItemId);
             adapter.setSelectId(selectedItemId);
+        }
+        if (ItemApplication.isNeedUpdate) {
+            selectedItemId = null;
         }
     }
 
