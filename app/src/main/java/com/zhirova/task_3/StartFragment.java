@@ -157,6 +157,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
+
         swipeRefreshLayout.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
             readingLoader = loaderManager.restartLoader(LOADER_FROM_NETWORK_ID,null, this);
@@ -167,7 +168,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onClick(String itemId) {
-        Log.d("KLS", "_______________onClick");
         if (RemoteApi.isOnline(getContext())) {
             selectedItemId = itemId;
             int selectedPosition = adapter.positionById(selectedItemId);
@@ -179,6 +179,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
             }
 
             if (isDualPane) {
+                fragmentManager.popBackStack();
                 DetailFragment details = (DetailFragment) fragmentManager.findFragmentById(R.id.details);
                 if (details == null) {
                     details = DetailFragment.create(itemId);
@@ -210,7 +211,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    private void initData() {
+    private void initAdapter() {
         adapter = new ItemsAdapter(getContext(), selectedItemId);
         adapter.setClickListener(this);
 
@@ -227,27 +228,33 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
         ItemDiffUtilCallback itemDiffUtilCallback = new ItemDiffUtilCallback(oldList, newList);
         DiffUtil.DiffResult itemDiffResult = DiffUtil.calculateDiff(itemDiffUtilCallback, true);
-        initData();
+        initAdapter();
         adapter.setData(actualNews);
         itemDiffResult.dispatchUpdatesTo(adapter);
 
-        Handler scrollHandler = new Handler(Looper.getMainLooper());
-        scrollHandler.postDelayed(() -> {
-            recyclerView.smoothScrollToPosition(0);
-        }, 200);
-
         View detailsFrame = getActivity().findViewById(R.id.details);
         isDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
-        if (selectedItemId == null) {
-            selectedItemId = actualNews.get(0).getId();
-        }
+
         if (isDualPane) {
+            if (selectedItemId == null) {
+                selectedItemId = actualNews.get(0).getId();
+            }
             onClick(selectedItemId);
             adapter.setSelectId(selectedItemId);
+            if (ItemApplication.isNeedUpdate) {
+                selectedItemId = null;
+            }
         }
-        if (ItemApplication.isNeedUpdate) {
-            selectedItemId = null;
+
+        int selectedPosition = 0;
+        if (selectedItemId != null) {
+            selectedPosition = adapter.positionById(selectedItemId);
         }
+        int finalSelectedPosition = selectedPosition;
+        Handler scrollHandler = new Handler(Looper.getMainLooper());
+        scrollHandler.postDelayed(() -> {
+            recyclerView.smoothScrollToPosition(finalSelectedPosition);
+        }, 200);
     }
 
 
