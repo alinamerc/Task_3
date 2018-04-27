@@ -32,14 +32,12 @@ public class LocalApi {
 
 
     public List<Item> getNews() {
-        Log.d("KLS", "getNews");
         List<Item> news = DatabaseApi.getAllItems(database);
         return news;
     }
 
 
     public void updateNews(List<Item> news) {
-        Log.d("KLS", "updateNews");
         DatabaseApi.deleteAllItems(database);
         for (Item curItem:news) {
             DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),

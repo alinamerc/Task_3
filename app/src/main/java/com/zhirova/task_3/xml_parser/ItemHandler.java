@@ -102,6 +102,7 @@ public class ItemHandler extends DefaultHandler {
     private long handleDate(String dateString) throws ParseException {
         //2018-04-04T08:18:54+00:00
         // DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+
         //Wed, 04 Apr 2018 12:08:21 +0000
         DateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
         Date date = format.parse(dateString);

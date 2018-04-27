@@ -15,13 +15,11 @@ import java.util.List;
 
 public class FromDatabaseLoader extends AsyncTaskLoader<List<Item>> {
 
-    private final String TAG = "START_FRAGMENT";
-    private final Context context;
+    private final String TAG = "FROM_DATABASE_LOADER";
 
 
     public FromDatabaseLoader(@NonNull Context context) {
         super(context);
-        this.context = context;
     }
 
 

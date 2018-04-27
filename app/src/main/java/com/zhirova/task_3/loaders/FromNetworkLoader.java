@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
 
-    private final String TAG = "START_FRAGMENT";
+    private final String TAG = "FROM_NETWORK_LOADER";
     private Context context;
     private String url;
 

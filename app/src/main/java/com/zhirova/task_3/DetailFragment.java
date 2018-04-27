@@ -27,7 +27,6 @@ public class DetailFragment extends Fragment {
     private ImageView detailImage;
     private TextView titleText;
     private TextView descText;
-    private boolean isDualPane = false;
 
 
     public static DetailFragment create(String id){

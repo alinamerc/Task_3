@@ -70,7 +70,6 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
             if (clickListener != null) {
                 String itemId = (String)v.getTag();
                 clickListener.onClick(itemId);
-                holder.itemElement.setBackgroundResource(R.color.backColorPressed);
                 selectId = itemId;
                 notifyDataSetChanged();
             }

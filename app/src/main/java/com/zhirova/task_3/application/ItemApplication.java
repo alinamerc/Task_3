@@ -22,20 +22,17 @@ public class ItemApplication extends Application implements LifecycleObserver {
         super.onCreate();
         localApi = LocalApi.getInstance(getBaseContext());
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
-        //Log.d(TAG, "onCreate");
     }
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     void onEnterForeground() {
-        //Log.d(TAG, "onEnterForeground");
         isNeedUpdate = true;
     }
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     void onEnterBackground() {
-        //Log.d(TAG, "onEnterBackground");
     }
 
 

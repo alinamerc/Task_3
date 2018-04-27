@@ -170,7 +170,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onClick(String itemId) {
         if (RemoteApi.isOnline(getContext())) {
             selectedItemId = itemId;
-            int selectedPosition = adapter.positionById(selectedItemId);
+            int selectedPosition = adapter.positionById(itemId);
             if (selectedPosition > 0) {
                 Handler scrollHandler = new Handler(Looper.getMainLooper());
                 scrollHandler.postDelayed(() -> {
@@ -222,7 +222,6 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     private void updateRecycleView(List<Item> actualNews) {
-        Log.d("KLS", "updateRecycleView");
         List<Item> oldList = new ArrayList<>(oldNews);
         List<Item> newList = new ArrayList<>(actualNews);
 

@@ -1,7 +1,6 @@
 package com.zhirova.task_3.data_repository;
 
 
-
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -33,7 +32,6 @@ public class RemoteApi {
 
 
     public static List<Item> loadNews(String urlString) {
-        Log.d("KLS", "loadNews");
         List<Item> items = new ArrayList<>();
         if (urlString != null) {
             InputStream resultStream = null;
