@@ -3,11 +3,10 @@ package com.zhirova.task_3.data_repository;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.zhirova.task_3.database.DatabaseApi;
 import com.zhirova.task_3.database.DatabaseHelper;
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 
 import java.util.List;
 
@@ -26,20 +25,20 @@ public class LocalApi {
     }
 
 
-    public Item getSelectedNews(String id) {
+    public NewsItem getSelectedNews(String id) {
         return DatabaseApi.getSelectedItem(database, id);
     }
 
 
-    public List<Item> getNews() {
-        List<Item> news = DatabaseApi.getAllItems(database);
+    public List<NewsItem> getNews() {
+        List<NewsItem> news = DatabaseApi.getAllItems(database);
         return news;
     }
 
 
-    public void updateNews(List<Item> news) {
+    public void updateNews(List<NewsItem> news) {
         DatabaseApi.deleteAllItems(database);
-        for (Item curItem:news) {
+        for (NewsItem curItem:news) {
             DatabaseApi.addItem(curItem.getId(), curItem.getTitle(), curItem.getDescription(),
                     curItem.getImage(), (int) curItem.getDate(), database);
         }

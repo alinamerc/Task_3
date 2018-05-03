@@ -2,7 +2,7 @@ package com.zhirova.task_3.xml_parser;
 
 import android.util.Log;
 
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -15,8 +15,8 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class ItemXmlParser {
 
-    public static List<Item> parse(InputStream in) {
-        List<Item> news = null;
+    public static List<NewsItem> parse(InputStream in) {
+        List<NewsItem> news = null;
         try {
             XMLReader xmlReader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
             ItemHandler itemHandler = new ItemHandler();

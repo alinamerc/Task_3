@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class DatabaseApi {
     }
 
 
-    public static List<Item> getAllItems(SQLiteDatabase database) {
+    public static List<NewsItem> getAllItems(SQLiteDatabase database) {
         Cursor cursor = database.query(ItemContract.ItemEntry.TABLE_NAME, ItemContract.ItemEntry.itemAllColumns,
                 null, null, null, null,
                 ItemContract.ItemEntry.COLUMN_DATE + " DESC");
@@ -58,18 +58,18 @@ public class DatabaseApi {
     }
 
 
-    public static Item getSelectedItem(SQLiteDatabase database, String id) {
+    public static NewsItem getSelectedItem(SQLiteDatabase database, String id) {
         String selection = ItemContract.ItemEntry.COLUMN_ID + " = ?";
         String[] selectionArgs = {id};
         Cursor cursor = database.query(ItemContract.ItemEntry.TABLE_NAME, ItemContract.ItemEntry.itemAllColumns,
                 selection, selectionArgs, null, null, null);
-        List<Item> items = getResultFromCursor(cursor);
+        List<NewsItem> items = getResultFromCursor(cursor);
         return items.get(0);
     }
 
 
-    private static List<Item> getResultFromCursor(Cursor cursor) {
-        List<Item> result = new ArrayList<>();
+    private static List<NewsItem> getResultFromCursor(Cursor cursor) {
+        List<NewsItem> result = new ArrayList<>();
 
         if (cursor != null) {
             int idIndex = cursor.getColumnIndex(ItemContract.ItemEntry.COLUMN_ID);
@@ -85,7 +85,7 @@ public class DatabaseApi {
                 String image = cursor.getString(imageIndex);
                 int date = cursor.getInt(dateIndex);
 
-                Item curItem = new Item();
+                NewsItem curItem = new NewsItem();
                 curItem.setId(id);
                 curItem.setTitle(title);
                 curItem.setDescription(desc);

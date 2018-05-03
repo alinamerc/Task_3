@@ -8,7 +8,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.zhirova.task_3.application.ItemApplication;
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 import com.zhirova.task_3.data_repository.RemoteApi;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
+public class FromNetworkLoader extends AsyncTaskLoader<List<NewsItem>> {
 
     private final String TAG = "FROM_NETWORK_LOADER";
     private Context context;
@@ -32,13 +32,13 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<Item>> {
 
     @Nullable
     @Override
-    public List<Item> loadInBackground() {
+    public List<NewsItem> loadInBackground() {
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             Log.e(TAG, "ERROR", e);
         }
-        List<Item> news = new ArrayList<>();
+        List<NewsItem> news = new ArrayList<>();
         if (RemoteApi.isOnline(context)) {
             news = RemoteApi.loadNews(url);
             ItemApplication.localApi.updateNews(news);

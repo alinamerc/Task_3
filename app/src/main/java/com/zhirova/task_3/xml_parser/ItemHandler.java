@@ -2,7 +2,7 @@ package com.zhirova.task_3.xml_parser;
 
 import android.util.Log;
 
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -18,12 +18,12 @@ import java.util.Locale;
 public class ItemHandler extends DefaultHandler {
 
     private final String TAG = "ITEM_HANDLER";
-    private ArrayList<Item> news;
-    private Item curItem;
+    private ArrayList<NewsItem> news;
+    private NewsItem curItem;
     private StringBuilder builder;
 
 
-    public ArrayList<Item> getNews() {
+    public ArrayList<NewsItem> getNews() {
         return news;
     }
 
@@ -77,7 +77,7 @@ public class ItemHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, org.xml.sax.Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
         if (localName.equalsIgnoreCase("item")){
-            curItem = new Item();
+            curItem = new NewsItem();
             builder.setLength(0);
         }
 

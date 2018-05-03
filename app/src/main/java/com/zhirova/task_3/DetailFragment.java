@@ -1,25 +1,17 @@
 package com.zhirova.task_3;
 
-import android.arch.lifecycle.Lifecycle;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextClock;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.zhirova.task_3.application.ItemApplication;
-import com.zhirova.task_3.database.DatabaseApi;
-import com.zhirova.task_3.database.DatabaseHelper;
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 
 public class DetailFragment extends Fragment {
 
@@ -62,7 +54,7 @@ public class DetailFragment extends Fragment {
     private void initData() {
         Bundle bundle = getArguments();
         String curItemId = bundle.getString(BUNDLE_ID);
-        Item curItem = ItemApplication.localApi.getSelectedNews(curItemId);
+        NewsItem curItem = ItemApplication.localApi.getSelectedNews(curItemId);
 
         Picasso.get().load(curItem.getImage()).into(detailImage);
         titleText.setText(curItem.getTitle());

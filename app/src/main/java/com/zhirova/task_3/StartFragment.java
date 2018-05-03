@@ -28,13 +28,13 @@ import com.zhirova.task_3.data_repository.RemoteApi;
 import com.zhirova.task_3.diff_util.ItemDiffUtilCallback;
 import com.zhirova.task_3.loaders.FromDatabaseLoader;
 import com.zhirova.task_3.loaders.FromNetworkLoader;
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class StartFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Item>>,
+public class StartFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<NewsItem>>,
         ItemsAdapter.ClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private final String TAG = "START_FRAGMENT";
@@ -44,8 +44,8 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     private final int LOADER_FROM_DATABASE_ID = 1;
     private final int LOADER_FROM_NETWORK_ID = 2;
 
-    private Loader<List<Item>> readingLoader;
-    private List<Item> oldNews = new ArrayList<>();
+    private Loader<List<NewsItem>> readingLoader;
+    private List<NewsItem> oldNews = new ArrayList<>();
 
     private FragmentManager fragmentManager;
     private LoaderManager loaderManager;
@@ -95,7 +95,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @NonNull
     @Override
-    public Loader<List<Item>> onCreateLoader(int id, @Nullable Bundle args) {
+    public Loader<List<NewsItem>> onCreateLoader(int id, @Nullable Bundle args) {
         if (id == LOADER_FROM_DATABASE_ID) {
             readingLoader = new FromDatabaseLoader(getContext());
         }
@@ -107,7 +107,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     @Override
-    public void onLoadFinished(@NonNull Loader<List<Item>> loader, List<Item> data) {
+    public void onLoadFinished(@NonNull Loader<List<NewsItem>> loader, List<NewsItem> data) {
         progressBar.setVisibility(View.INVISIBLE);
         infoText.setVisibility(View.INVISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
@@ -149,7 +149,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
     @Override
-    public void onLoaderReset(@NonNull Loader<List<Item>> loader) {
+    public void onLoaderReset(@NonNull Loader<List<NewsItem>> loader) {
     }
 
 
@@ -221,9 +221,9 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    private void updateRecycleView(List<Item> actualNews) {
-        List<Item> oldList = new ArrayList<>(oldNews);
-        List<Item> newList = new ArrayList<>(actualNews);
+    private void updateRecycleView(List<NewsItem> actualNews) {
+        List<NewsItem> oldList = new ArrayList<>(oldNews);
+        List<NewsItem> newList = new ArrayList<>(actualNews);
 
         ItemDiffUtilCallback itemDiffUtilCallback = new ItemDiffUtilCallback(oldList, newList);
         DiffUtil.DiffResult itemDiffResult = DiffUtil.calculateDiff(itemDiffUtilCallback, true);
@@ -257,7 +257,7 @@ public class StartFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    private void print(List<Item> news) {
+    private void print(List<NewsItem> news) {
         for (int i = 0; i < news.size(); i++) {
             Log.d(TAG, "==========================================");
             Log.d(TAG, "ID = " + news.get(i).getId() + "\n" +

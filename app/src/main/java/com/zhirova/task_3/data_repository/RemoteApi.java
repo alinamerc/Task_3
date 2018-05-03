@@ -6,7 +6,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.zhirova.task_3.model.Item;
+import com.zhirova.task_3.model.NewsItem;
 import com.zhirova.task_3.xml_parser.ItemXmlParser;
 
 import java.io.IOException;
@@ -31,8 +31,8 @@ public class RemoteApi {
     }
 
 
-    public static List<Item> loadNews(String urlString) {
-        List<Item> items = new ArrayList<>();
+    public static List<NewsItem> loadNews(String urlString) {
+        List<NewsItem> items = new ArrayList<>();
         if (urlString != null) {
             InputStream resultStream = null;
             try {
