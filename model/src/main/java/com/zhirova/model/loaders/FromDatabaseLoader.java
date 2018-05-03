@@ -1,13 +1,13 @@
-package com.zhirova.task_3.loaders;
+package com.zhirova.model.loaders;
 
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
-
-import com.zhirova.task_3.application.ItemApplication;
-import com.zhirova.task_3.model.NewsItem;
+import com.zhirova.domain.NewsItem;
+import com.zhirova.local.local_repository.LocalApi;
+import com.zhirova.local.local_repository.LocalApiImpl;
 
 import java.util.List;
 
@@ -25,7 +25,8 @@ public class FromDatabaseLoader extends AsyncTaskLoader<List<NewsItem>> {
     @Nullable
     @Override
     public List<NewsItem> loadInBackground() {
-        return ItemApplication.getLocalApi().getNews();
+        LocalApi localApi = LocalApiImpl.getInstance();
+        return localApi.getNews();
     }
 
 

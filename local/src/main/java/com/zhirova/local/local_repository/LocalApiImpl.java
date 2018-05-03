@@ -3,6 +3,8 @@ package com.zhirova.local.local_repository;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.zhirova.common.NewsItemApplication;
 import com.zhirova.domain.NewsItem;
 import com.zhirova.local.database.DatabaseApi;
 import com.zhirova.local.database.DatabaseHelper;
@@ -16,9 +18,9 @@ public class LocalApiImpl implements LocalApi {
     private SQLiteDatabase database;
 
 
-    public static LocalApiImpl getInstance(Context context){
+    public static LocalApiImpl getInstance(){
         if (INSTANCE == null){
-            INSTANCE = new LocalApiImpl(context);
+            INSTANCE = new LocalApiImpl();
         }
         return INSTANCE;
     }
@@ -48,7 +50,8 @@ public class LocalApiImpl implements LocalApi {
     }
 
 
-    private LocalApiImpl(Context context) {
+    private LocalApiImpl() {
+        Context context = NewsItemApplication.getContext();
         database = new DatabaseHelper(context).getWritableDatabase();
     }
 

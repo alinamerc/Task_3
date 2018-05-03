@@ -1,4 +1,4 @@
-package com.zhirova.task_3.loaders;
+package com.zhirova.model.loaders;
 
 
 import android.content.Context;
@@ -7,9 +7,11 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.zhirova.task_3.application.ItemApplication;
-import com.zhirova.task_3.model.NewsItem;
-import com.zhirova.task_3.data_repository.RemoteApi;
+import com.zhirova.domain.NewsItem;
+import com.zhirova.local.local_repository.LocalApi;
+import com.zhirova.local.local_repository.LocalApiImpl;
+import com.zhirova.remote.remote_repository.RemoteApi;
+import com.zhirova.remote.remote_repository.RemoteApiImpl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +21,11 @@ import java.util.concurrent.TimeUnit;
 public class FromNetworkLoader extends AsyncTaskLoader<List<NewsItem>> {
 
     private final String TAG = "FROM_NETWORK_LOADER";
-    private Context context;
-    private String url;
+    private final String url;
 
 
     public FromNetworkLoader(@NonNull Context context, String url) {
         super(context);
-        this.context = context;
         this.url = url;
     }
 
@@ -38,11 +38,12 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<NewsItem>> {
         } catch (InterruptedException e) {
             Log.e(TAG, "ERROR", e);
         }
-        List<NewsItem> news = new ArrayList<>();
-        if (RemoteApi.isOnline(context)) {
-            news = RemoteApi.loadNews(url);
-            ItemApplication.getLocalApi().updateNews(news);
-        }
+        RemoteApi remoteApi = new RemoteApiImpl();
+        List<NewsItem> news = remoteApi.loadNews(url);
+
+        LocalApi localApi = LocalApiImpl.getInstance();
+        localApi.refreshNews(news);
+
         return news;
     }
 

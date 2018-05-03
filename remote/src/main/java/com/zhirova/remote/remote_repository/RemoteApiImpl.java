@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import com.zhirova.common.NewsItemApplication;
 import com.zhirova.domain.NewsItem;
 import com.zhirova.remote.mapper.ItemMapper;
 
@@ -22,7 +23,8 @@ public class RemoteApiImpl implements RemoteApi {
     private final static String TAG = "REMOTE_API";
 
 
-    public static boolean isOnline(Context context) {
+    public static boolean isOnline() {
+        Context context = NewsItemApplication.getContext();
         ConnectivityManager connectivityManager =
                 (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
