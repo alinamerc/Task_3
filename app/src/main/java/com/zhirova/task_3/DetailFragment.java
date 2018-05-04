@@ -54,7 +54,7 @@ public class DetailFragment extends Fragment {
     private void initData() {
         Bundle bundle = getArguments();
         String curItemId = bundle.getString(BUNDLE_ID);
-        NewsItem curItem = ItemApplication.localApi.getSelectedNews(curItemId);
+        NewsItem curItem = ItemApplication.getLocalApi().getSelectedNews(curItemId);
 
         Picasso.get().load(curItem.getImage()).into(detailImage);
         titleText.setText(curItem.getTitle());
