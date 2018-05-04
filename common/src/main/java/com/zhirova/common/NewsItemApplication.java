@@ -14,15 +14,14 @@ public class NewsItemApplication extends Application implements LifecycleObserve
     private final String TAG = "ITEM_APPLICATION";
     private static NewsItemApplication INSTANCE;
     public static boolean isNeedUpdate = false;
-    //private static LocalApi localApi;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
         INSTANCE = this;
-        //localApi = LocalApi.getInstance(getBaseContext());
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
+
     }
 
 
@@ -35,11 +34,6 @@ public class NewsItemApplication extends Application implements LifecycleObserve
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     void onEnterBackground() {
     }
-
-
-//    public static LocalApi getLocalApi(){
-//        return localApi;
-//    }
 
 
     public static Context getContext(){

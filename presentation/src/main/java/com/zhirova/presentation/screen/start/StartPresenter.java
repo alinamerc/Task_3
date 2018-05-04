@@ -12,16 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class StartPresenter {
-
-    private final StartView startView;
-    private final NewsItemCache newsItemCache;
+public class StartPresenter implements StartContract.Presenter{
 
 
-    public StartPresenter(StartView startView, boolean isForce, String url) {
-        this.startView = startView;
-        newsItemCache = new NewsItemCacheImpl(isForce, url, (FragmentActivity) startView);
-        updateScreen();
+    private StartContract.View view;
+    private NewsItemCache newsItemCache;
+
+    private final static String url = "";
+
+
+    public StartPresenter() {
+     //   newsItemCache = new NewsItemCacheImpl();
     }
 
 
@@ -31,12 +32,18 @@ public class StartPresenter {
     }
 
 
-    private void updateScreen() {
+    public List<NewsItemPresent> getNews() {
         List<NewsItem> news = newsItemCache.getData();
-        startView.updateNewsList(mapper(news));
+        return mapper(news);
+    }
 
+
+    private void updateScreen() {
+        if(view == null) return;
+        List<NewsItem> news = newsItemCache.getData();
+        view.updateNewsList(mapper(news));
         String curStatus = newsItemCache.getStatus();
-        startView.updateMessagesAndEnvironment(curStatus);
+        view.updateMessagesAndEnvironment(curStatus);
     }
 
 
@@ -51,4 +58,15 @@ public class StartPresenter {
     }
 
 
+    @Override
+    public void subscribe(FragmentActivity view, boolean needUpdate) {
+        this.view = view;
+        newsItemCache = new NewsItemCacheImpl(needUpdate, url, (FragmentActivity) view);
+        updateScreen();
+    }
+
+    @Override
+    public void unsubsribe(StartContract.View view) {
+        this.view = null;
+    }
 }

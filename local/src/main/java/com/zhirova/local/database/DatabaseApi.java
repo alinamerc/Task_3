@@ -49,18 +49,19 @@ public class DatabaseApi {
 
 
     public static List<NewsItem> getAllItems(SQLiteDatabase database) {
-        Cursor cursor = database.query(NewsItemContract.NewsItemEntry.TABLE_NAME, NewsItemContract.NewsItemEntry.newsItemAllColumns,
+        Cursor cursor = database.query(NewsItemContract.NewsItemEntry.TABLE_NAME,
+                NewsItemContract.NewsItemEntry.newsItemAllColumns,
                 null, null, null, null,
                 NewsItemContract.NewsItemEntry.COLUMN_DATE + " DESC");
         return getResultFromCursor(cursor);
-
     }
 
 
     public static NewsItem getSelectedItem(SQLiteDatabase database, String id) {
         String selection = NewsItemContract.NewsItemEntry.COLUMN_ID + " = ?";
         String[] selectionArgs = {id};
-        Cursor cursor = database.query(NewsItemContract.NewsItemEntry.TABLE_NAME, NewsItemContract.NewsItemEntry.newsItemAllColumns,
+        Cursor cursor = database.query(NewsItemContract.NewsItemEntry.TABLE_NAME,
+                NewsItemContract.NewsItemEntry.newsItemAllColumns,
                 selection, selectionArgs, null, null, null);
         List<NewsItem> items = getResultFromCursor(cursor);
         return items.get(0);

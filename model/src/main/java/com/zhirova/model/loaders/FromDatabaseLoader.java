@@ -25,8 +25,7 @@ public class FromDatabaseLoader extends AsyncTaskLoader<List<NewsItem>> {
     @Nullable
     @Override
     public List<NewsItem> loadInBackground() {
-        LocalApi localApi = LocalApiImpl.getInstance();
-        return localApi.getNews();
+        return new LocalApiImpl(getContext()).getNews();
     }
 
 

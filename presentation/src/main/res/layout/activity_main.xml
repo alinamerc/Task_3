@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment class="com.zhirova.task_3.StartFragment"
+    <fragment class="com.zhirova.presentation.screen.start.StartFragment"
         android:id="@+id/start"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

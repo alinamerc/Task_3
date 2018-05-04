@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import com.zhirova.domain.NewsItem;
 import com.zhirova.presentation.R;
+import com.zhirova.presentation.model.NewsItemPresent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHolder> {
 
     private final LayoutInflater inflater;
-    private List<NewsItem> items = new ArrayList<>();
+    private List<NewsItemPresent> items = new ArrayList<>();
     private ClickListener clickListener;
     private String selectId = null;
 
@@ -29,7 +29,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     }
 
 
-    public void setData(List<NewsItem> items){
+    public void setData(List<NewsItemPresent> items){
         this.items.clear();
         if (items != null){
             this.items.addAll(items);
@@ -77,7 +77,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
 
     @Override
     public void onBindViewHolder(ItemsViewHolder holder, int position) {
-        NewsItem curItem = items.get(position);
+        NewsItemPresent curItem = items.get(position);
         holder.itemView.setTag(curItem.getId());
         holder.itemTitle.setText(curItem.getTitle());
 
