@@ -10,7 +10,7 @@ public final class NewsItemContract {
 
 
     public static abstract class NewsItemEntry implements BaseColumns {
-        public final static String TABLE_NAME = "News";
+        public static final String TABLE_NAME = "News";
         public static final String COLUMN_ID = "id";
         public static final String COLUMN_TITLE = "title";
         public static final String COLUMN_DESC = "description";

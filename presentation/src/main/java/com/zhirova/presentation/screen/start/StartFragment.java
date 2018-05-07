@@ -1,6 +1,5 @@
 package com.zhirova.presentation.screen.start;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -15,11 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.zhirova.common.NewsItemApplication;
 import com.zhirova.domain.NewsItem;
 import com.zhirova.presentation.R;
 import com.zhirova.presentation.adapter.ItemsAdapter;
+import com.zhirova.presentation.application.NewsItemApplication;
 import com.zhirova.presentation.diff_util.ItemDiffUtilCallback;
 import com.zhirova.presentation.model.NewsItemPresent;
 
@@ -29,12 +27,11 @@ import java.util.List;
 
 public class StartFragment extends Fragment
         implements StartContract.View,
-        ItemsAdapter.ClickListener,
-        SwipeRefreshLayout.OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener,
+        ItemsAdapter.ClickListener {
 
     private final String TAG = "START_FRAGMENT";
     private final String BUNDLE_SELECTED = "SELECTED_ITEM";
-    private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
 
     private StartContract.Presenter startPresenter;
     private List<NewsItemPresent> oldNews = new ArrayList<>();
@@ -56,8 +53,8 @@ public class StartFragment extends Fragment
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        initUI(view);
         startPresenter = new StartPresenter();
+        initUI(view);
     }
 
 
@@ -70,17 +67,17 @@ public class StartFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        startPresenter.subscribe(this, NewsItemApplication.isNeedUpdate);
-        NewsItemApplication.isNeedUpdate = false;
-
+        startPresenter.subscribe(getContext(), NewsItemApplication.needUpdate, this);
+        NewsItemApplication.needUpdate = false;
     }
+
 
     @Override
     public void onStop() {
         super.onStop();
         startPresenter.unsubsribe(this);
-
     }
+
 
     @Override
     public void updateNewsList(List<NewsItemPresent> actualNews) {
@@ -122,26 +119,20 @@ public class StartFragment extends Fragment
 
     @Override
     public void updateMessagesAndEnvironment(String status) {
-        progressBar.setVisibility(View.INVISIBLE);
-        infoText.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.GONE);
+        infoText.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
 
         if (status.equals("EMPTY_DB")) {
             progressBar.setVisibility(View.VISIBLE);
         } else if (status.equals("NO_NEWS")) {
             infoText.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.INVISIBLE);
+            recyclerView.setVisibility(View.GONE);
         } else if (status.equals("NO_CONNECTION")) {
             Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet),
                     Snackbar.LENGTH_LONG);
             snackbar.show();
         }
-    }
-
-
-    @Override
-    public void onClick(String itemId) {
-
     }
 
 
@@ -157,6 +148,11 @@ public class StartFragment extends Fragment
     }
 
 
+    @Override
+    public void onClick(String itemId) {
+    }
+
+
     private void initUI(View root) {
         recyclerView = root.findViewById(R.id.recycler_view_items);
         progressBar = root.findViewById(R.id.progress_bar);
@@ -167,12 +163,10 @@ public class StartFragment extends Fragment
 
 
     private void initAdapter() {
-        Context context = NewsItemApplication.getContext();
-        adapter = new ItemsAdapter(context, null);
+        adapter = new ItemsAdapter(getContext(), null);
         adapter.setClickListener(this);
-
         recyclerView.setAdapter(adapter);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
     }
 

@@ -1,21 +1,25 @@
 package com.zhirova.presentation.screen.start;
 
+import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
 import com.zhirova.presentation.model.NewsItemPresent;
 
 import java.util.List;
 
+
 public class StartContract {
 
-    interface View{
+    public interface View{
         void updateNewsList(List<NewsItemPresent> actualNews);
         void updateMessagesAndEnvironment(String status);
     }
 
-    interface Presenter{
-        void subscribe(FragmentActivity view, boolean needUpdate);
+
+    public interface Presenter{
+        void subscribe(Context context, boolean needUpdate, View view);
         void unsubsribe(View view);
+        void refreshNews();
     }
 
 

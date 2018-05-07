@@ -1,6 +1,7 @@
 package com.zhirova.presentation.screen.start;
 
 
+import android.content.Context;
 import android.support.v4.app.FragmentActivity;
 
 import com.zhirova.domain.NewsItem;
@@ -12,34 +13,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class StartPresenter implements StartContract.Presenter{
+public class StartPresenter implements StartContract.Presenter {
 
-
+    private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
     private StartContract.View view;
     private NewsItemCache newsItemCache;
 
-    private final static String url = "";
 
-
-    public StartPresenter() {
-     //   newsItemCache = new NewsItemCacheImpl();
+    @Override
+    public void subscribe(Context context, boolean needUpdate, StartContract.View view) {
+        this.view = view;
+        newsItemCache = new NewsItemCacheImpl(context, needUpdate, URL, (FragmentActivity) view);
+        updateScreen();
     }
 
 
+    @Override
+    public void unsubsribe(StartContract.View view) {
+        this.view = null;
+    }
+
+
+    @Override
     public void refreshNews() {
         newsItemCache.refreshData();
         updateScreen();
     }
 
 
-    public List<NewsItemPresent> getNews() {
-        List<NewsItem> news = newsItemCache.getData();
-        return mapper(news);
-    }
-
-
     private void updateScreen() {
-        if(view == null) return;
+        if (view == null) return;
         List<NewsItem> news = newsItemCache.getData();
         view.updateNewsList(mapper(news));
         String curStatus = newsItemCache.getStatus();
@@ -49,7 +52,6 @@ public class StartPresenter implements StartContract.Presenter{
 
     private List<NewsItemPresent> mapper(List<NewsItem> news) {
         List<NewsItemPresent> transformNews = new ArrayList<>();
-
         for (NewsItem curNewsItem: news) {
             NewsItemPresent curNewsItemPresent = new NewsItemPresent(false, curNewsItem);
             transformNews.add(curNewsItemPresent);
@@ -58,15 +60,4 @@ public class StartPresenter implements StartContract.Presenter{
     }
 
 
-    @Override
-    public void subscribe(FragmentActivity view, boolean needUpdate) {
-        this.view = view;
-        newsItemCache = new NewsItemCacheImpl(needUpdate, url, (FragmentActivity) view);
-        updateScreen();
-    }
-
-    @Override
-    public void unsubsribe(StartContract.View view) {
-        this.view = null;
-    }
 }

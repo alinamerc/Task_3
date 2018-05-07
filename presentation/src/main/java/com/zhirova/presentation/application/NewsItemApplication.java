@@ -1,4 +1,4 @@
-package com.zhirova.common;
+package com.zhirova.presentation.application;
 
 
 import android.app.Application;
@@ -6,14 +6,13 @@ import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.LifecycleObserver;
 import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
-import android.content.Context;
 
 
 public class NewsItemApplication extends Application implements LifecycleObserver {
 
     private final String TAG = "ITEM_APPLICATION";
     private static NewsItemApplication INSTANCE;
-    public static boolean isNeedUpdate = false;
+    public static boolean needUpdate = false;
 
 
     @Override
@@ -21,23 +20,17 @@ public class NewsItemApplication extends Application implements LifecycleObserve
         super.onCreate();
         INSTANCE = this;
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
-
     }
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     void onEnterForeground() {
-        isNeedUpdate = true;
+        needUpdate = true;
     }
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     void onEnterBackground() {
-    }
-
-
-    public static Context getContext(){
-        return INSTANCE;
     }
 
 

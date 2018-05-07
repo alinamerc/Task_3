@@ -41,7 +41,7 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<NewsItem>> {
         RemoteApi remoteApi = new RemoteApiImpl();
         List<NewsItem> news = remoteApi.loadNews(url);
 
-        LocalApi localApi = LocalApiImpl.getInstance();
+        LocalApi localApi = new LocalApiImpl(getContext());
         localApi.refreshNews(news);
 
         return news;

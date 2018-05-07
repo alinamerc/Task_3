@@ -14,10 +14,16 @@ import java.util.List;
 public class LocalApiImpl implements LocalApi {
 
     SQLiteDatabase database;
+
+
+    public LocalApiImpl(Context context) {
+        database = new DatabaseHelper(context).getWritableDatabase();
+    }
+
+
     @Override
     public List<NewsItem> getNews() {
-        List<NewsItem> news = DatabaseApi.getAllItems(database);
-        return news;
+        return DatabaseApi.getAllItems(database);
     }
 
 
@@ -35,11 +41,6 @@ public class LocalApiImpl implements LocalApi {
                     curNewsItem.getDescription(), curNewsItem.getImage(),
                     (int) curNewsItem.getDate(), database);
         }
-    }
-
-
-    public LocalApiImpl(Context context) {
-        database = new DatabaseHelper(context).getWritableDatabase();
     }
 
 

@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 import com.zhirova.domain.NewsItem;
-import com.zhirova.local.local_repository.LocalApi;
 import com.zhirova.local.local_repository.LocalApiImpl;
 
 import java.util.List;

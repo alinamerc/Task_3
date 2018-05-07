@@ -81,11 +81,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
         holder.itemView.setTag(curItem.getId());
         holder.itemTitle.setText(curItem.getTitle());
 
-        if (curItem.getId().equals(selectId)) {
-            holder.itemElement.setBackgroundResource(R.color.backColorPressed);
-        } else {
-            holder.itemElement.setBackgroundResource(R.color.backColorDefault);
-        }
+//        if (curItem.getId().equals(selectId)) {
+//            holder.itemElement.setBackgroundResource(R.color.backColorPressed);
+//        } else {
+//            holder.itemElement.setBackgroundResource(R.color.backColorDefault);
+//        }
     }
 
 

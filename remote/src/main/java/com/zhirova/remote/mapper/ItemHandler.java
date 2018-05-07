@@ -90,11 +90,10 @@ public class ItemHandler extends DefaultHandler {
 
 
     private String handleDescription(String desc) {
-        String newDesc1 = desc.replace("<div>", "");
-        String newDesc2 = newDesc1.replace("</div>", "");
-        String newDesc3 = newDesc2.replace("<br />", "");
-        String newDesc4 = newDesc3.replace("&nbsp;", " ");
-        return newDesc4;
+        return desc.replace("<div>", "")
+                   .replace("</div>", "")
+                   .replace("<br />", "")
+                   .replace("&nbsp;", "");
     }
 
 
@@ -105,8 +104,7 @@ public class ItemHandler extends DefaultHandler {
         //Wed, 04 Apr 2018 12:08:21 +0000
         DateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss", Locale.ENGLISH);
         Date date = format.parse(dateString);
-        long millisecondsCount = date.getTime();
-        return millisecondsCount;
+        return date.getTime();
     }
 
 

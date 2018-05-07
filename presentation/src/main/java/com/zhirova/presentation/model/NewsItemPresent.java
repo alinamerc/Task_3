@@ -6,23 +6,28 @@ import com.zhirova.domain.NewsItem;
 
 public class NewsItemPresent {
 
-    private boolean isSelected;
+    private boolean selected;
     private NewsItem newsItem;
 
 
-    public NewsItemPresent(boolean isSelected, NewsItem newsItem) {
-        this.isSelected = isSelected;
-        this.newsItem = newsItem;
+    public NewsItemPresent(boolean selected, NewsItem newsItem) {
+        this.selected = selected;
+        this.newsItem = new NewsItem();
+        this.newsItem.setId(newsItem.getId());
+        this.newsItem.setTitle(newsItem.getTitle());
+        this.newsItem.setDescription(newsItem.getDescription());
+        this.newsItem.setImage(newsItem.getImage());
+        this.newsItem.setDate(newsItem.getDate());
     }
 
 
     public boolean isSelected() {
-        return isSelected;
+        return selected;
     }
 
 
     public void setSelected(boolean selected) {
-        isSelected = selected;
+        this.selected = selected;
     }
 
 

@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import com.zhirova.common.NewsItemApplication;
 import com.zhirova.domain.NewsItem;
 import com.zhirova.model.loaders.FromDatabaseLoader;
 import com.zhirova.model.loaders.FromNetworkLoader;
@@ -15,6 +14,7 @@ import com.zhirova.remote.remote_repository.RemoteApiImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import static java.security.AccessController.getContext;
 
 
 public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCallbacks<List<NewsItem>> {
@@ -22,7 +22,8 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
     private final int LOADER_FROM_DATABASE_ID = 1;
     private final int LOADER_FROM_NETWORK_ID = 2;
 
-    private boolean isForce;
+    private  Context context;
+    private boolean needUpdate;
     private final String url;
     private final LoaderManager loaderManager;
     private Loader<List<NewsItem>> readingLoader;
@@ -31,8 +32,9 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
     private String status = null;
 
 
-    public NewsItemCacheImpl(boolean isForce, String url, FragmentActivity activity) {
-        this.isForce = isForce;
+    public NewsItemCacheImpl(Context context, boolean needUpdate, String url, FragmentActivity activity) {
+        this.context = context;
+        this.needUpdate = needUpdate;
         this.url = url;
         loaderManager = activity.getSupportLoaderManager();
         loaderManager.destroyLoader(LOADER_FROM_DATABASE_ID);
@@ -75,7 +77,6 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
     @NonNull
     @Override
     public Loader<List<NewsItem>> onCreateLoader(int id, @Nullable Bundle args) {
-        Context context = NewsItemApplication.getContext();
         if (id == LOADER_FROM_DATABASE_ID) {
             readingLoader = new FromDatabaseLoader(context);
         }
@@ -94,8 +95,8 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
 
         int id = loader.getId();
         if (id == LOADER_FROM_DATABASE_ID) {
-            if (isForce) {
-                isForce = false;
+            if (needUpdate) {
+                needUpdate = false;
                 readingLoader = loaderManager.initLoader(LOADER_FROM_NETWORK_ID,null, this);
                 if (data.size() == 0) {
                     setStatus("EMPTY_DB");
@@ -107,7 +108,7 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
             }
         }
         else if (id == LOADER_FROM_NETWORK_ID) {
-            if (RemoteApiImpl.isOnline()) {
+            if (RemoteApiImpl.isOnline(context)) {
                 if (data.size() == 0) {
                     setStatus("NO_NEWS");
                 }
