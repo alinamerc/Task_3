@@ -33,11 +33,11 @@ public class FromNetworkLoader extends AsyncTaskLoader<List<NewsItem>> {
     @Nullable
     @Override
     public List<NewsItem> loadInBackground() {
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "ERROR", e);
-        }
+//        try {
+//            TimeUnit.SECONDS.sleep(1);
+//        } catch (InterruptedException e) {
+//            Log.e(TAG, "ERROR", e);
+//        }
         RemoteApi remoteApi = new RemoteApiImpl();
         List<NewsItem> news = remoteApi.loadNews(url);
 

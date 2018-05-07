@@ -1,20 +1,25 @@
 package com.zhirova.model.cache;
 
 import android.content.Context;
+import android.database.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.Log;
+
 import com.zhirova.domain.NewsItem;
+import com.zhirova.local.local_repository.LocalApi;
+import com.zhirova.local.local_repository.LocalApiImpl;
 import com.zhirova.model.loaders.FromDatabaseLoader;
 import com.zhirova.model.loaders.FromNetworkLoader;
+import com.zhirova.remote.remote_repository.RemoteApi;
 import com.zhirova.remote.remote_repository.RemoteApiImpl;
 
 import java.util.ArrayList;
 import java.util.List;
-import static java.security.AccessController.getContext;
 
 
 public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCallbacks<List<NewsItem>> {
@@ -29,16 +34,26 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
     private Loader<List<NewsItem>> readingLoader;
 
     private List<NewsItem> news = new ArrayList<>();
-    private String status = null;
+    private String status = "";
 
 
-    public NewsItemCacheImpl(Context context, boolean needUpdate, String url, FragmentActivity activity) {
+    public NewsItemCacheImpl(Context context, boolean needUpdate, String url, Fragment fragment) {
         this.context = context;
         this.needUpdate = needUpdate;
         this.url = url;
-        loaderManager = activity.getSupportLoaderManager();
+        loaderManager = fragment.getActivity().getSupportLoaderManager();
         loaderManager.destroyLoader(LOADER_FROM_DATABASE_ID);
         readingLoader = loaderManager.initLoader(LOADER_FROM_DATABASE_ID,null, this);
+
+
+        LocalApi localApi = new LocalApiImpl(context);
+        Observable<List<NewsItem>> localNews = (Observable<List<NewsItem>>) localApi.getNews();
+
+        if (needUpdate) {
+            RemoteApi remoteApi = new RemoteApiImpl();
+            Observable<List<NewsItem>> remoteNews = (Observable<List<NewsItem>>) remoteApi.loadNews(url);
+        }
+
     }
 
 
@@ -77,6 +92,7 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
     @NonNull
     @Override
     public Loader<List<NewsItem>> onCreateLoader(int id, @Nullable Bundle args) {
+        Log.d("DATA", "onCreateLoader ");
         if (id == LOADER_FROM_DATABASE_ID) {
             readingLoader = new FromDatabaseLoader(context);
         }
@@ -89,11 +105,15 @@ public class NewsItemCacheImpl implements NewsItemCache, LoaderManager.LoaderCal
 
     @Override
     public void onLoadFinished(@NonNull Loader<List<NewsItem>> loader, List<NewsItem> data) {
+        Log.d("DATA", "onLoadFinished______data.size() = " + data.size());
         if (data.size() > 0) {
             setData(data);
         }
 
         int id = loader.getId();
+        Log.d("DATA", "onLoadFinished______id = " + id);
+        Log.d("DATA", "needUpdate = " + needUpdate);
+
         if (id == LOADER_FROM_DATABASE_ID) {
             if (needUpdate) {
                 needUpdate = false;

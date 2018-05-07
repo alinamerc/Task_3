@@ -12,7 +12,7 @@ public class NewsItemApplication extends Application implements LifecycleObserve
 
     private final String TAG = "ITEM_APPLICATION";
     private static NewsItemApplication INSTANCE;
-    public static boolean needUpdate = false;
+    public static boolean needUpdate = true;
 
 
     @Override

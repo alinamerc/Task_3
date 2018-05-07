@@ -1,6 +1,7 @@
 package com.zhirova.presentation.screen.start;
 
 import android.content.Context;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
 import com.zhirova.presentation.model.NewsItemPresent;
@@ -17,7 +18,7 @@ public class StartContract {
 
 
     public interface Presenter{
-        void subscribe(Context context, boolean needUpdate, View view);
+        void subscribe(Context context, boolean needUpdate, Fragment view);
         void unsubsribe(View view);
         void refreshNews();
     }
