@@ -7,5 +7,5 @@ import java.util.List;
 
 
 public interface RemoteApi {
-    List<NewsItem> loadNews(String urlString);
+    List<NewsItem> loadNews();
 }

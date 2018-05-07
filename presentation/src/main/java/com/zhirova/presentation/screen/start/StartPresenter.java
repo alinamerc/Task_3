@@ -2,67 +2,65 @@ package com.zhirova.presentation.screen.start;
 
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-
-import com.zhirova.domain.NewsItem;
-import com.zhirova.model.cache.NewsItemCache;
-import com.zhirova.model.cache.NewsItemCacheImpl;
-import com.zhirova.presentation.model.NewsItemPresent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.zhirova.model.NewsModel;
+import com.zhirova.model.NewsModelImpl;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 
 public class StartPresenter implements StartContract.Presenter {
 
     private final String TAG = "START_PRESENTER";
-    private final String URL = "https://www.sport.ru/rssfeeds/news.rss";
     private StartContract.View view;
-    private NewsItemCache newsItemCache;
+    private NewsModel newsModel;
+    private CompositeDisposable disposables;
 
 
     @Override
-    public void subscribe(Context context, boolean needUpdate, Fragment view) {
-        this.view = (StartContract.View) view;
-        newsItemCache = new NewsItemCacheImpl(context, needUpdate, URL, view);
-        updateScreen();
+    public void subscribe(StartContract.View view, boolean needUpdate, Context context) {
+        this.view = view;
+        newsModel = new NewsModelImpl(context);
+        disposables = new CompositeDisposable();
+        updateScreen(needUpdate);
     }
 
 
     @Override
     public void unsubsribe(StartContract.View view) {
         this.view = null;
+        disposables.dispose();
     }
 
 
     @Override
     public void refreshNews() {
-        newsItemCache.refreshData();
-        updateScreen();
+        updateScreen(true);
     }
 
 
-    private void updateScreen() {
+    private void updateScreen(boolean needUpdate) {
         if (view == null) return;
-        List<NewsItem> news = newsItemCache.getData();
-
-        Log.d("DATA", "updateScreen_______news.size() = " + news.size());
-
-        view.updateNewsList(mapper(news));
-        String curStatus = newsItemCache.getStatus();
-        view.updateMessagesAndEnvironment(curStatus);
-    }
-
-
-    private List<NewsItemPresent> mapper(List<NewsItem> news) {
-        List<NewsItemPresent> transformNews = new ArrayList<>();
-        for (NewsItem curNewsItem: news) {
-            NewsItemPresent curNewsItemPresent = new NewsItemPresent(false, curNewsItem);
-            transformNews.add(curNewsItemPresent);
-        }
-        return transformNews;
+        Disposable d = newsModel.getNews(needUpdate)
+                .subscribe(dataContainer -> {
+                    if (dataContainer.getData().size() == 0){
+                        if (dataContainer.isLocal()){
+                            view.showLoader();
+                        } else {
+                            view.showInfoAboutLackOfNews();
+                        }
+                    } else {
+                        view.updateNewsList(dataContainer.getData());
+                    }
+                }, throwable -> {
+//                    if (throwable instanceof ServerException){
+//                        view.showServerError();
+//                    } else if (throwable instanceof InternetException) {
+//                        view.showInternetError();
+//                    } else {
+//                        view.showError();
+//                    }
+                });
+        disposables.add(d);
     }
 
 

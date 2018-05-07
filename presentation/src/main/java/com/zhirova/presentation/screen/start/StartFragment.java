@@ -19,7 +19,7 @@ import com.zhirova.presentation.R;
 import com.zhirova.presentation.adapter.ItemsAdapter;
 import com.zhirova.presentation.application.NewsItemApplication;
 import com.zhirova.presentation.diff_util.ItemDiffUtilCallback;
-import com.zhirova.presentation.model.NewsItemPresent;
+import com.zhirova.presentation.model.NewsItemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class StartFragment extends Fragment
     private final String BUNDLE_SELECTED = "SELECTED_ITEM";
 
     private StartContract.Presenter startPresenter;
-    private List<NewsItemPresent> oldNews = new ArrayList<>();
+    private List<NewsItem> oldNews = new ArrayList<>();
 
     private ItemsAdapter adapter;
     private RecyclerView recyclerView;
@@ -67,7 +67,7 @@ public class StartFragment extends Fragment
     @Override
     public void onStart() {
         super.onStart();
-        startPresenter.subscribe(getContext(), NewsItemApplication.needUpdate, this);
+        startPresenter.subscribe(this, NewsItemApplication.needUpdate, getContext());
         NewsItemApplication.needUpdate = false;
     }
 
@@ -80,9 +80,9 @@ public class StartFragment extends Fragment
 
 
     @Override
-    public void updateNewsList(List<NewsItemPresent> actualNews) {
-        List<NewsItemPresent> oldList = new ArrayList<>(oldNews);
-        List<NewsItemPresent> newList = new ArrayList<>(actualNews);
+    public void updateNewsList(List<NewsItem> actualNews) {
+        List<NewsItem> oldList = new ArrayList<>(oldNews);
+        List<NewsItem> newList = new ArrayList<>(actualNews);
         oldNews = new ArrayList<>(actualNews);
 
         ItemDiffUtilCallback itemDiffUtilCallback = new ItemDiffUtilCallback(oldList, newList);
@@ -118,21 +118,33 @@ public class StartFragment extends Fragment
 
 
     @Override
-    public void updateMessagesAndEnvironment(String status) {
-        progressBar.setVisibility(View.GONE);
-        infoText.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.VISIBLE);
+    public void showLoader() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
 
-        if (status.equals("EMPTY_DB")) {
-            progressBar.setVisibility(View.VISIBLE);
-        } else if (status.equals("NO_NEWS")) {
-            infoText.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-        } else if (status.equals("NO_CONNECTION")) {
-            Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet),
-                    Snackbar.LENGTH_LONG);
-            snackbar.show();
-        }
+
+    @Override
+    public void showInfoAboutLackOfNews() {
+        infoText.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+    }
+
+
+    @Override
+    public void showInternetError() {
+        Snackbar snackbar = Snackbar.make(getView(), getResources().getString(R.string.no_internet),
+                Snackbar.LENGTH_LONG);
+        snackbar.show();
+    }
+
+
+    @Override
+    public void showServerError() {
+    }
+
+
+    @Override
+    public void showError() {
     }
 
 
@@ -140,7 +152,6 @@ public class StartFragment extends Fragment
     public void onRefresh() {
         swipeRefreshLayout.setRefreshing(true);
         swipeRefreshLayout.setColorSchemeResources(R.color.refresh1, R.color.refresh2, R.color.refresh3);
-
         swipeRefreshLayout.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(false);
             startPresenter.refreshNews();
@@ -159,6 +170,10 @@ public class StartFragment extends Fragment
         infoText = root.findViewById(R.id.info_text_view);
         swipeRefreshLayout = root.findViewById(R.id.refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        progressBar.setVisibility(View.GONE);
+        infoText.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
 

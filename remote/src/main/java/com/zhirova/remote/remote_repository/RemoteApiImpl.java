@@ -19,6 +19,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class RemoteApiImpl implements RemoteApi {
 
     private final static String TAG = "REMOTE_API";
+    private final String NEWS_LINK = "https://www.sport.ru/rssfeeds/news.rss";
 
 
     public static boolean isOnline(Context context) {
@@ -30,27 +31,25 @@ public class RemoteApiImpl implements RemoteApi {
 
 
     @Override
-    public List<NewsItem> loadNews(String urlString) {
+    public List<NewsItem> loadNews() {
         List<NewsItem> news = new ArrayList<>();
-        if (urlString != null) {
-            InputStream resultStream = null;
-            try {
-                URL url = new URL(urlString);
-                resultStream = downloadUrl(url);
-                if (resultStream != null) {
-                    news = ItemMapper.parseXml(resultStream);
-                } else {
-                    throw new IOException("No response received.");
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "MALFORMED URL ERROR", e);
-            } finally {
-                if (resultStream != null) {
-                    try {
-                        resultStream.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "INPUT STREAM CLOSING ERROR", e);
-                    }
+        InputStream resultStream = null;
+        try {
+            URL url = new URL(NEWS_LINK);
+            resultStream = downloadUrl(url);
+            if (resultStream != null) {
+                news = ItemMapper.parseXml(resultStream);
+            } else {
+                throw new IOException("No response received.");
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "MALFORMED URL ERROR", e);
+        } finally {
+            if (resultStream != null) {
+                try {
+                    resultStream.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "INPUT STREAM CLOSING ERROR", e);
                 }
             }
         }

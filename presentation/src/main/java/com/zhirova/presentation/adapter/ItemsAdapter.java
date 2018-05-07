@@ -8,8 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.zhirova.domain.NewsItem;
 import com.zhirova.presentation.R;
-import com.zhirova.presentation.model.NewsItemPresent;
+import com.zhirova.presentation.model.NewsItemAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ import java.util.List;
 public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHolder> {
 
     private final LayoutInflater inflater;
-    private List<NewsItemPresent> items = new ArrayList<>();
+    private List<NewsItemAdapter> items = new ArrayList<>();
     private ClickListener clickListener;
     private String selectId = null;
 
@@ -29,10 +31,10 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     }
 
 
-    public void setData(List<NewsItemPresent> items){
+    public void setData(List<NewsItem> items){
         this.items.clear();
         if (items != null){
-            this.items.addAll(items);
+            this.items.addAll(mapper(items));
         }
         //notifyDataSetChanged();
     }
@@ -77,7 +79,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
 
     @Override
     public void onBindViewHolder(ItemsViewHolder holder, int position) {
-        NewsItemPresent curItem = items.get(position);
+        NewsItemAdapter curItem = items.get(position);
         holder.itemView.setTag(curItem.getId());
         holder.itemTitle.setText(curItem.getTitle());
 
@@ -92,6 +94,16 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemsViewHol
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+
+    private List<NewsItemAdapter> mapper(List<NewsItem> news) {
+        List<NewsItemAdapter> transformNews = new ArrayList<>();
+        for (NewsItem curNewsItem : news) {
+            NewsItemAdapter curNewsItemPresent = new NewsItemAdapter(false, curNewsItem);
+            transformNews.add(curNewsItemPresent);
+        }
+        return transformNews;
     }
 
 

@@ -4,13 +4,13 @@ package com.zhirova.presentation.model;
 import com.zhirova.domain.NewsItem;
 
 
-public class NewsItemPresent {
+public class NewsItemAdapter {
 
     private boolean selected;
     private NewsItem newsItem;
 
 
-    public NewsItemPresent(boolean selected, NewsItem newsItem) {
+    public NewsItemAdapter(boolean selected, NewsItem newsItem) {
         this.selected = selected;
         this.newsItem = new NewsItem();
         this.newsItem.setId(newsItem.getId());
